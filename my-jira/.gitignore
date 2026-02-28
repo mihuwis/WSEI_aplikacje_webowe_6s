@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+
+# production build
+dist/
+
+# local env files
+.env
+.env.*
+!.env.example
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# coverage
+coverage/
+
+# local storage dumps (jeśli kiedyś będziesz robił mocki JSON)
+*.local.json
