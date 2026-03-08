@@ -1,6 +1,7 @@
 # Important npm installs
 
 npm install react-router-dom  
+npm i uuid
 
 ## ETAP1
 #### localStorage

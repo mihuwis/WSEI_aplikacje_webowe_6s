@@ -4,12 +4,12 @@ export interface Project {
     description: string
 }
 
-export interface CreateProjectDTO {
+export interface CreateProjectDto {
     name: string,
     description: string
 }
 
-export interface UpdateProjectDTO {
+export interface UpdateProjectDto {
     name?: string,
     description?: string
 }
