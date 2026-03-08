@@ -2,7 +2,21 @@
 
 npm install react-router-dom  
 
+## ETAP1
+#### localStorage
 
+key:
+mini-jira-projects
+
+value:
+JSON.stringify(Project[])
+
+
+
+
+
+Repo prowadzącego 
+https://github.com/rbrzegowy/S-Programowanie-aplikacji-webowych/tree/main/laboratoria/lab%201
 
 # React + TypeScript + Vite
 
