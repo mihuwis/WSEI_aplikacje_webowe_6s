@@ -1,6 +1,5 @@
 import type { Project, CreateProjectDto, UpdateProjectDto } from "../types/project.types";
-import { v4 as uuidv4 } from 'uuid'; // decyduje sie na uuid a nie na recznei dopisywane wymyślane pseudo randomowe stringi. chyba nie będzi epotrzebny util do generwoania tego tylko dam w projekice npm i uuid
-
+import { v4 as uuidv4 } from 'uuid'; 
 
 const PROJECTS_STORAGE_KEY : string = "little-jira-projects";
 
