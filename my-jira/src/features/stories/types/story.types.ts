@@ -1,12 +1,12 @@
 export interface Story {
     id: string,
-    nazwa: string,
-    opis: string,
+    name: string,
+    description: string,
     priority: Priority,
-    projekt: string,
-    dateOfCreation: string,
-    stan: Status,
-    owner: string,
+    projektId: string,
+    createdAt: string,
+    status: Status,
+    ownerId: string,
 }
 
 export type Priority =
