@@ -59,8 +59,10 @@ const update = (id:string, data: UpdateStoryDto) : Story | undefined=> {
 
     const storyToUpdate = getById(id);
     if(storyToUpdate === undefined) return undefined;
-    if(data.name) storyToUpdate.name = data.name;
-    if(data.description) storyToUpdate.description = data.description;
+    if(data.name != undefined) storyToUpdate.name = data.name;
+    if(data.description != undefined) storyToUpdate.description = data.description;
+    if(data.priority != undefined) storyToUpdate.priority = data.priority;
+    if(data.status != undefined) storyToUpdate.status = data.status;
     saveToLS(currentListOfStories)
     return storyToUpdate;
 }
