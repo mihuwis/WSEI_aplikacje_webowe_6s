@@ -28,14 +28,10 @@ const getAll = () : Project[] =>{
 const getById = (id : string) : Project | undefined => { 
     const listOfProjects = readFromLS();
     const returnedProject = listOfProjects.find(o => o.id === id);
-
     return returnedProject;
-
-
 }
 
 const create = (data: CreateProjectDto) : Project => {
-    
     // pobranie z LS calosci 
     const currentListOfProjects : Project[] = getAll();
     // Tworzenie nowego obiektu
@@ -44,7 +40,6 @@ const create = (data: CreateProjectDto) : Project => {
     currentListOfProjects.push(newProject);
     // save do LS
     saveToLS(currentListOfProjects);
-
     return newProject;
 
 }
