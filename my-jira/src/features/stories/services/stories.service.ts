@@ -2,9 +2,7 @@ import { userService } from "../../users/services/user.service";
 import type { Story, CreateStoryDto, UpdateStoryDto} from "../types/story.types"
 import { v4 as uuidv4 } from 'uuid'; 
 
-
 const STORY_STORAGE_KEY : string = "little-jira-stories";
-
 
 const readFromLS = () :Story[] => {
     const storedStories = localStorage.getItem(STORY_STORAGE_KEY);
@@ -32,11 +30,8 @@ const getById = (id : string) : Story | undefined => {
 }
 
 const getByProjectId = (projectId: string) : Story[]=> {
-
     const listOfStories : Story[]  = getAll();
-    
     const listOfStoriesInProject = listOfStories.filter(s => s.projectId === projectId);
-
     return listOfStoriesInProject;
 }
 
@@ -58,7 +53,6 @@ const createForProject = (projectId: string, data: CreateStoryDto) : Story => {
     return newStory;
 }
 
-
 const update = (id:string, data: UpdateStoryDto) : Story | undefined=> {
     // pobranie z LS calosci 
     const currentListOfStories : Story[] = getAll();
@@ -72,13 +66,9 @@ const update = (id:string, data: UpdateStoryDto) : Story | undefined=> {
 }
 
 const deleteById = (id: string) :Story[] => {
-        // pobranie z LS calosci 
     const currentListOfStories : Story[] = getAll();
-
     const newListAfterDeletion =  currentListOfStories.filter(o => o.id !== id);
-
     saveToLS(newListAfterDeletion);
-
     return newListAfterDeletion;
 }
 
