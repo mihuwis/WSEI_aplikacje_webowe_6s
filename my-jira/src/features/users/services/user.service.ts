@@ -1,10 +1,10 @@
 import type { User } from "../types/user.types";
 
 const MOCK_USER_1: User = {
-    id:"123", firstName:"Jan", lastName:"Nowak"
+    id:"123", firstName:"Jan", lastName:"Nowak", role: "admin"
 }
 const MOCK_USER_2: User = {
-    id:"125", firstName:"Sybilla", lastName:"Kociupko"
+    id:"125", firstName:"Sybilla", lastName:"Kociupko", role: "admin"
 }
 
 const LIST_OF_MOCK_USERS : User[] =
@@ -19,4 +19,4 @@ const getAllUsers = () : User[] => {
     return LIST_OF_MOCK_USERS;
 }
 
-export const userService = {getCurrentUser}
+export const userService = {getCurrentUser, getAllUsers}
