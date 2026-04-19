@@ -1,18 +1,24 @@
 import type { User } from "../types/user.types";
 
-const MOCK_USER_1: User = {
+const MOCK_USER_1_ADMIN: User = {
     id:"123", firstName:"Jan", lastName:"Nowak", role: "admin"
 }
-const MOCK_USER_2: User = {
+const MOCK_USER_2_ADMIN: User = {
     id:"125", firstName:"Sybilla", lastName:"Kociupko", role: "admin"
+}
+const MOCK_USER_3_DEVOPS: User = {
+    id:"127", firstName:"Greg", lastName:"Kociupko", role: "devops"
+}
+const MOCK_USER_4_DEVELOPER: User = {
+    id:"129", firstName:"Mat", lastName:"Bed", role: "developer"
 }
 
 const LIST_OF_MOCK_USERS : User[] =
-    [MOCK_USER_1, MOCK_USER_2]
+    [MOCK_USER_1_ADMIN, MOCK_USER_2_ADMIN, MOCK_USER_3_DEVOPS, MOCK_USER_4_DEVELOPER]
 
 
 const getCurrentUser = () : User => {
-    return MOCK_USER_1;
+    return MOCK_USER_2_ADMIN;
 }
 
 const getAllUsers = () : User[] => {
