@@ -16,7 +16,7 @@ export interface Task {
     storyId: string,
     estimatedTimeToComplete: string,
     status: Status,
-    userId?: string,
+    assignedUserId?: string,
     startedAt: string,
     completedAt: string,
     createdAt: string,
