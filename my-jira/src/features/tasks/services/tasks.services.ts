@@ -14,7 +14,7 @@ const readFromLS = () :Task[] => {
 
 }
 
-const saveToLS = (listOfTasks: Task[]) => {
+const saveToLS = (listOfTasks: Task[]): void => {
     localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(listOfTasks))
 }
 
@@ -42,9 +42,10 @@ const createForStory = (storyId: string, data: CreateTaskDto) : Task => {
         title: data.title,
         description: data.description,
         priority: data.priority,
+        estimatedHours: data.estimatedHours,
 
         storyId: storyId,
-
+        workedHours: 0,
         status: "todo",
         createdAt: new Date().toISOString()
     }
@@ -53,30 +54,35 @@ const createForStory = (storyId: string, data: CreateTaskDto) : Task => {
     return newTask;
 }
 
-const update = (id:string, data: UpdateTaskDto) : Task | undefined=> {
-    // pobranie z LS calosci 
-    const currentListOfTasks : Task[] = getAll();
+const update = (id: string, data: UpdateTaskDto): Task | undefined => {
+  const tasks = readFromLS();
 
-    const taskToUpdate = currentListOfTasks.find(o => o.id === id);
-    if(taskToUpdate === undefined) return undefined;
-    if(data.title != undefined) taskToUpdate.title = data.title;
-    if(data.description != undefined) taskToUpdate.description = data.description;
-    if(data.priority != undefined) taskToUpdate.priority = data.priority;
-    if(data.status != undefined) taskToUpdate.status = data.status;
-    if(data.estimatedHours != undefined) taskToUpdate.estimatedHours = data.estimatedHours;
-    if(data.workedHours != undefined) taskToUpdate.workedHours = data.workedHours;
-    if(data.assignedUserId != undefined) taskToUpdate.assignedUserId = data.assignedUserId;
-    if(data.createdAt != undefined) taskToUpdate.createdAt = data.createdAt;
-    if(data.completedAt != undefined) taskToUpdate.completedAt = data.completedAt;
-    saveToLS(currentListOfTasks)
-    return taskToUpdate;
-}
+  const taskToUpdate = tasks.find((task) => task.id === id);
 
-const deleteById = (id: string) :Task[] => {
-    const currentListOfTasks : Task[] = getAll();
-    const newListAfterDeletion =  currentListOfTasks.filter(o => o.id !== id);
-    saveToLS(newListAfterDeletion);
-    return newListAfterDeletion;
-}
+  if (!taskToUpdate) {
+    return undefined;
+  }
+
+  if (data.title !== undefined) taskToUpdate.title = data.title;
+  if (data.description !== undefined) taskToUpdate.description = data.description;
+  if (data.priority !== undefined) taskToUpdate.priority = data.priority;
+  if (data.estimatedHours !== undefined) taskToUpdate.estimatedHours = data.estimatedHours;
+  if (data.workedHours !== undefined) taskToUpdate.workedHours = data.workedHours;
+
+  saveToLS(tasks);
+
+  return taskToUpdate;
+};
+
+const deleteById = (id: string): Task[] => {
+  const tasks = readFromLS();
+
+  const tasksAfterDeletion = tasks.filter((task) => task.id !== id);
+
+  saveToLS(tasksAfterDeletion);
+
+  return tasksAfterDeletion;
+};
+
 
 export const tasksService = {getAll, getById, getByStoryId, createForStory, update, deleteById}

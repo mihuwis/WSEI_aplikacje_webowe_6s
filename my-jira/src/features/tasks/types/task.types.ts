@@ -33,17 +33,14 @@ export interface Task {
 export interface CreateTaskDto {
     title: string,
     description: string,
-    priority: TaskPriority
+    priority: TaskPriority,
+    estimatedHours?: number
 }
 
 export interface UpdateTaskDto {
-    title: string,
-    description: string,
-    priority: TaskPriority,
-    status: TaskStatus,
+    title?: string,
+    description?: string,
+    priority?: TaskPriority,
     estimatedHours?: number,
-    workedHours?: number,
-    assignedUserId?: string,
-    createdAt: string,
-    completedAt?: string
+    workedHours?: number
 }
