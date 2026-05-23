@@ -17,8 +17,8 @@ export interface Task {
 
     storyId: string,
 
-    estimatedHours: number
-    workedHours: number;
+    estimatedHours?: number
+    workedHours?: number;
 
     status: TaskStatus,
 
@@ -28,4 +28,22 @@ export interface Task {
     startedAt?: string,
     completedAt?: string
 
+}
+
+export interface CreateTaskDto {
+    title: string,
+    description: string,
+    priority: TaskPriority
+}
+
+export interface UpdateTaskDto {
+    title: string,
+    description: string,
+    priority: TaskPriority,
+    status: TaskStatus,
+    estimatedHours?: number,
+    workedHours?: number,
+    assignedUserId?: string,
+    createdAt: string,
+    completedAt?: string
 }
