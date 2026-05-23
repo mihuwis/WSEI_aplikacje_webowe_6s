@@ -1,25 +1,31 @@
-export type Priority =
+export type TaskPriority =
     |"high"
     |"medium"
     |"low";
 
-export type Status =
+export type TaskStatus =
     |"todo"
     |"doing"
     |"done";
 
 
-
 export interface Task {
     id: string,
-    priority: Priority,
+    title: string,
+    description: string,
+    priority: TaskPriority,
+
     storyId: string,
-    estimatedTimeToComplete: string,
-    status: Status,
+
+    estimatedHours: number
+    workedHours: number;
+
+    status: TaskStatus,
+
     assignedUserId?: string,
+
     createdAt: string,
-    startedAt: string,
-    completedAt: string,
-    reportedTo: string
+    startedAt?: string,
+    completedAt?: string
 
 }
