@@ -1,3 +1,4 @@
+import { userService } from "../../users/services/user.service";
 import type { Task, CreateTaskDto, UpdateTaskDto} from "../types/task.types"
 import { v4 as uuidv4 } from 'uuid'; 
 
@@ -84,5 +85,18 @@ const deleteById = (id: string): Task[] => {
   return tasksAfterDeletion;
 };
 
+
+const assignUserToTask = (userId: string, taskId: string  ) : void => {
+    // przypisanie użytkownika ma automatycznie:
+
+    // status = "doing"
+    // startedAt = now
+    // assignedUserId = userId
+};
+
+const markTaskAsDone = () : void => {
+    //status = "done"
+   // completedAt = now
+}
 
 export const tasksService = {getAll, getById, getByStoryId, createForStory, update, deleteById}
