@@ -86,17 +86,35 @@ const deleteById = (id: string): Task[] => {
 };
 
 
-const assignUserToTask = (userId: string, taskId: string  ) : void => {
+const assignUserToTask = (userId: string, taskId: string  ) : Task | undefined => {
     // przypisanie użytkownika ma automatycznie:
 
     // status = "doing"
     // startedAt = now
     // assignedUserId = userId
+    const tasks = readFromLS();
+    const taskToUpdate = tasks.find(t=> t.id == taskId);
+    if(!taskToUpdate) return undefined;
+    taskToUpdate.assignedUserId = userId;
+    taskToUpdate.status = 'doing';
+    taskToUpdate.startedAt = new Date().toISOString();
+    return taskToUpdate;
+
 };
 
-const markTaskAsDone = () : void => {
+const markTaskAsDone = (taskId: string ) : Task | undefined => {
     //status = "done"
    // completedAt = now
+
+    const listOfTasks = readFromLS();
+    const taskToUpdate = listOfTasks.find(t=>t.id===taskId);
+
+    if(taskToUpdate === undefined) return undefined;
+
+    taskToUpdate.status = 'done';
+    taskToUpdate.completedAt = new Date().toISOString();
+
+    return taskToUpdate;
 }
 
-export const tasksService = {getAll, getById, getByStoryId, createForStory, update, deleteById}
+export const tasksService = {getAll, getById, getByStoryId, createForStory, update, deleteById, markTaskAsDone, assignUserToTask}

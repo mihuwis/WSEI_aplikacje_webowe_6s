@@ -48,15 +48,19 @@ const update = (id:string, data: UpdateProjectDto) : Project | undefined=> {
     // pobranie z LS calosci 
     const currentListOfProjects : Project[] = getAll();
 
-    const projectToUpdate = getById(id);
-    if(projectToUpdate === undefined) return undefined;
+    const projectToUpdate = currentListOfProjects.find(o=> o.id === id);
+    if(!projectToUpdate) return undefined;
 
-    if(data.name) projectToUpdate.name = data.name;
+    if(data.name !== undefined) {
+        const name = data.name.trim();
+        if (!name){
+            throw new Error("Project name cannot be empty")
+        }
+        projectToUpdate.name = data.name;
+    } 
     if(data.description) projectToUpdate.description = data.description;
 
     saveToLS(currentListOfProjects)
-
-
 
     return projectToUpdate;
 }
