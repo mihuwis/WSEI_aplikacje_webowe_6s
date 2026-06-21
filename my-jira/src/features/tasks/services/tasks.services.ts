@@ -1,5 +1,7 @@
 import type { Task, CreateTaskDto, UpdateTaskDto} from "../types/task.types"
+import { getAllUsers } from "../../users/services/user.service"
 import { v4 as uuidv4 } from 'uuid'; 
+import type { User } from "../../users/types/user.types";
 
 const TASK_STORAGE_KEY : string = "little-jira-tasks";
 
@@ -93,7 +95,13 @@ const assignUserToTask = (userId: string, taskId: string  ) : Task | undefined =
     // assignedUserId = userId
     const tasks = readFromLS();
     const taskToUpdate = tasks.find(t=> t.id === taskId);
+
+    const listOfUsers : User[] = getAllUsers();
+    const assignedUsser = listOfUsers.find(u => u.id === userId)
+
     if(!taskToUpdate) return undefined;
+    if(!assignedUsser) return undefined;
+    
     taskToUpdate.assignedUserId = userId;
     taskToUpdate.status = 'doing';
     taskToUpdate.startedAt = new Date().toISOString();

@@ -21,7 +21,7 @@ const getCurrentUser = () : User => {
     return MOCK_USER_2_ADMIN;
 }
 
-const getAllUsers = () : User[] => {
+export const getAllUsers = () : User[] => {
     return LIST_OF_MOCK_USERS;
 }
 
