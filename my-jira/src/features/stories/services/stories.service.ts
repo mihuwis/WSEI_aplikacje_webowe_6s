@@ -56,14 +56,17 @@ const createForProject = (projectId: string, data: CreateStoryDto) : Story => {
 const update = (id:string, data: UpdateStoryDto) : Story | undefined=> {
     // pobranie z LS calosci 
     const currentListOfStories : Story[] = getAll();
+    const storyToUpdate = currentListOfStories.find(story => story.id === id);
 
-    const storyToUpdate = getById(id);
     if(storyToUpdate === undefined) return undefined;
+
     if(data.name != undefined) storyToUpdate.name = data.name;
     if(data.description != undefined) storyToUpdate.description = data.description;
     if(data.priority != undefined) storyToUpdate.priority = data.priority;
     if(data.status != undefined) storyToUpdate.status = data.status;
+
     saveToLS(currentListOfStories)
+    
     return storyToUpdate;
 }
 

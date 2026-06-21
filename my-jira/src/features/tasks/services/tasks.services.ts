@@ -92,7 +92,7 @@ const assignUserToTask = (userId: string, taskId: string  ) : Task | undefined =
     // startedAt = now
     // assignedUserId = userId
     const tasks = readFromLS();
-    const taskToUpdate = tasks.find(t=> t.id == taskId);
+    const taskToUpdate = tasks.find(t=> t.id === taskId);
     if(!taskToUpdate) return undefined;
     taskToUpdate.assignedUserId = userId;
     taskToUpdate.status = 'doing';
