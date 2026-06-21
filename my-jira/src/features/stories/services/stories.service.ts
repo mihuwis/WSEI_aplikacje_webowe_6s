@@ -19,7 +19,7 @@ const saveToLS = (listOfStories: Story[]) => {
     localStorage.setItem(STORY_STORAGE_KEY, JSON.stringify(listOfStories))
 }
 
-const getAll = () : Story[] =>{
+export const getAllStories = () : Story[] =>{
     return readFromLS();
 }
 
@@ -30,14 +30,14 @@ const getById = (id : string) : Story | undefined => {
 }
 
 const getByProjectId = (projectId: string) : Story[]=> {
-    const listOfStories : Story[]  = getAll();
+    const listOfStories : Story[]  = getAllStories();
     const listOfStoriesInProject = listOfStories.filter(s => s.projectId === projectId);
     return listOfStoriesInProject;
 }
 
 const createForProject = (projectId: string, data: CreateStoryDto) : Story => {
 
-    const currentListOfStories = getAll();
+    const currentListOfStories = getAllStories();
     const newStory : Story = {
         id: uuidv4(),
         name: data.name,
@@ -53,9 +53,9 @@ const createForProject = (projectId: string, data: CreateStoryDto) : Story => {
     return newStory;
 }
 
-const update = (id:string, data: UpdateStoryDto) : Story | undefined=> {
+const updateStory = (id:string, data: UpdateStoryDto) : Story | undefined=> {
     // pobranie z LS calosci 
-    const currentListOfStories : Story[] = getAll();
+    const currentListOfStories : Story[] = getAllStories();
     const storyToUpdate = currentListOfStories.find(story => story.id === id);
 
     if(storyToUpdate === undefined) return undefined;
@@ -71,10 +71,10 @@ const update = (id:string, data: UpdateStoryDto) : Story | undefined=> {
 }
 
 const deleteById = (id: string) :Story[] => {
-    const currentListOfStories : Story[] = getAll();
+    const currentListOfStories : Story[] = getAllStories();
     const newListAfterDeletion =  currentListOfStories.filter(o => o.id !== id);
     saveToLS(newListAfterDeletion);
     return newListAfterDeletion;
 }
 
-export const storyService = {getAll, getById, getByProjectId, createForProject, update, deleteById}
+export const storyService = {getAllStories, getById, getByProjectId, createForProject, updateStory, deleteById}

@@ -1,7 +1,9 @@
 import type { Task, CreateTaskDto, UpdateTaskDto} from "../types/task.types"
 import { getAllUsers } from "../../users/services/user.service"
+import { storyService } from "../../stories/services/stories.service"
 import { v4 as uuidv4 } from 'uuid'; 
 import type { User } from "../../users/types/user.types";
+import type { Story } from "../../stories/types/story.types";
 
 const TASK_STORAGE_KEY : string = "little-jira-tasks";
 
@@ -99,12 +101,23 @@ const assignUserToTask = (userId: string, taskId: string  ) : Task | undefined =
     const listOfUsers : User[] = getAllUsers();
     const assignedUsser = listOfUsers.find(u => u.id === userId)
 
+    const listOfStories : Story[] = storyService.getAllStories();
+    const currentStory = listOfStories.find(s => s.id === taskToUpdate?.storyId);
+    
+
     if(!taskToUpdate) return undefined;
     if(!assignedUsser) return undefined;
+
+    if(assignedUsser.role === 'admin') return undefined;
+    if(!currentStory) return undefined;
     
     taskToUpdate.assignedUserId = userId;
     taskToUpdate.status = 'doing';
     taskToUpdate.startedAt = new Date().toISOString();
+
+    if(currentStory.status === 'todo' || currentStory.status === 'done'){
+        storyService.updateStory(currentStory.id, {status: "doing"})
+    }
 
     saveToLS(tasks);
     return taskToUpdate;
