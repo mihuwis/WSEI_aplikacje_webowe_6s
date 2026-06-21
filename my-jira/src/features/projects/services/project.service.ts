@@ -52,11 +52,11 @@ const update = (id:string, data: UpdateProjectDto) : Project | undefined=> {
     if(!projectToUpdate) return undefined;
 
     if(data.name !== undefined) {
-        const name = data.name.trim();
-        if (!name){
+        const trimmedName = data.name.trim();
+        if (!trimmedName){
             throw new Error("Project name cannot be empty")
         }
-        projectToUpdate.name = data.name;
+        projectToUpdate.name = trimmedName;
     } 
     if(data.description) projectToUpdate.description = data.description;
 

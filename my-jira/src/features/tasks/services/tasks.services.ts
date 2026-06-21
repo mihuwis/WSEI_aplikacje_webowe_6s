@@ -1,4 +1,3 @@
-import { userService } from "../../users/services/user.service";
 import type { Task, CreateTaskDto, UpdateTaskDto} from "../types/task.types"
 import { v4 as uuidv4 } from 'uuid'; 
 
@@ -98,6 +97,8 @@ const assignUserToTask = (userId: string, taskId: string  ) : Task | undefined =
     taskToUpdate.assignedUserId = userId;
     taskToUpdate.status = 'doing';
     taskToUpdate.startedAt = new Date().toISOString();
+
+    saveToLS(tasks);
     return taskToUpdate;
 
 };
@@ -114,6 +115,7 @@ const markTaskAsDone = (taskId: string ) : Task | undefined => {
     taskToUpdate.status = 'done';
     taskToUpdate.completedAt = new Date().toISOString();
 
+    saveToLS(listOfTasks);
     return taskToUpdate;
 }
 
