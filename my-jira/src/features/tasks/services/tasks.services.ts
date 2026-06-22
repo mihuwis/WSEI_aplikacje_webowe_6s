@@ -89,7 +89,7 @@ const deleteById = (id: string): Task[] => {
 };
 
 
-const assignUserToTask = (userId: string, taskId: string  ) : TaskActionResult| undefined => {
+const assignUserToTask = (userId: string, taskId: string  ) : TaskActionResult => {
     // przypisanie użytkownika ma automatycznie:
 
     // status = "doing"
@@ -107,15 +107,16 @@ const assignUserToTask = (userId: string, taskId: string  ) : TaskActionResult| 
 
     if(!taskToUpdate) return { success: false, reason: "task-not-found"}
     if(!assignedUsser) return { success: false, reason: "user-not-assigned" };
-
-    if(assignedUsser.role === 'admin') return undefined;
-    if(!currentStory) return undefined;
+    if(assignedUsser.role !== 'developer' && assignedUsser.role !== 'devops' ) return { success: false, reason: "user-role-not-allowed" };
+    if(!currentStory) return { success: false, reason: "story-not-found" }
     
     taskToUpdate.assignedUserId = userId;
     taskToUpdate.status = 'doing';
-    taskToUpdate.startedAt = new Date().toISOString();
+    if(! taskToUpdate.startedAt){
+        taskToUpdate.startedAt = new Date().toISOString();
+    }
 
-    if(currentStory.status === 'todo' || currentStory.status === 'done'){
+    if(currentStory.status === 'todo'){
         storyService.updateStory(currentStory.id, {status: "doing"})
     }
 
@@ -124,23 +125,34 @@ const assignUserToTask = (userId: string, taskId: string  ) : TaskActionResult| 
 
 };
 
-const markTaskAsDone = (taskId: string ) : Task | undefined => {
+const markTaskAsDone = (taskId: string ) : TaskActionResult => {
     //status = "done"
    // completedAt = now
 
     const listOfTasks = readFromLS();
     const taskToUpdate = listOfTasks.find(t=>t.id===taskId);
 
-    if(taskToUpdate === undefined) return undefined;
-
-    if(!taskToUpdate.assignedUserId) return undefined;
+    if(taskToUpdate === undefined) return { success: false, reason: "task-not-found"};
+    if(!taskToUpdate.assignedUserId) return { success: false, reason: "user-not-assigned" };
 
     taskToUpdate.status = 'done';
     taskToUpdate.completedAt = new Date().toISOString();
-    taskToUpdate.workedHours = Date.parse(taskToUpdate.startedAt)  - new Date()
+    if (taskToUpdate.startedAt){
+        const miliseconds =  Date.parse(taskToUpdate.completedAt) -  Date.parse(taskToUpdate.startedAt)
+        taskToUpdate.workedHours = Math.round((miliseconds / 3600000) *100)/100; 
+    } else{
+        taskToUpdate.workedHours = 0;
+    }
+
+    const listOfTasksFromCurrentStory : Task[] = listOfTasks.filter(task=> task.storyId === taskToUpdate.storyId);
+    const allTaskinStoryDone = listOfTasksFromCurrentStory.every(t=> t.status = 'done');
+
+    if(allTaskinStoryDone){
+        storyService.updateStory(taskToUpdate.storyId, {status: "done"})
+    }
 
     saveToLS(listOfTasks);
-    return taskToUpdate;
+    return {success: true, task: taskToUpdate};
 }
 
 export const tasksService = {getAll, getById, getByStoryId, createForStory, update, deleteById, markTaskAsDone, assignUserToTask}
