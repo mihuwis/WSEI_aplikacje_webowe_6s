@@ -1,4 +1,4 @@
-import type { Task, CreateTaskDto, UpdateTaskDto} from "../types/task.types"
+import type { Task, CreateTaskDto, UpdateTaskDto, TaskActionResult} from "../types/task.types"
 import { getAllUsers } from "../../users/services/user.service"
 import { storyService } from "../../stories/services/stories.service"
 import { v4 as uuidv4 } from 'uuid'; 
@@ -89,7 +89,7 @@ const deleteById = (id: string): Task[] => {
 };
 
 
-const assignUserToTask = (userId: string, taskId: string  ) : Task | undefined => {
+const assignUserToTask = (userId: string, taskId: string  ) : TaskActionResult| undefined => {
     // przypisanie użytkownika ma automatycznie:
 
     // status = "doing"
@@ -105,8 +105,8 @@ const assignUserToTask = (userId: string, taskId: string  ) : Task | undefined =
     const currentStory = listOfStories.find(s => s.id === taskToUpdate?.storyId);
     
 
-    if(!taskToUpdate) return undefined;
-    if(!assignedUsser) return undefined;
+    if(!taskToUpdate) return { success: false, reason: "task-not-found"}
+    if(!assignedUsser) return { success: false, reason: "user-not-assigned" };
 
     if(assignedUsser.role === 'admin') return undefined;
     if(!currentStory) return undefined;
@@ -120,7 +120,7 @@ const assignUserToTask = (userId: string, taskId: string  ) : Task | undefined =
     }
 
     saveToLS(tasks);
-    return taskToUpdate;
+    return {success: true, task: taskToUpdate}
 
 };
 
@@ -133,8 +133,11 @@ const markTaskAsDone = (taskId: string ) : Task | undefined => {
 
     if(taskToUpdate === undefined) return undefined;
 
+    if(!taskToUpdate.assignedUserId) return undefined;
+
     taskToUpdate.status = 'done';
     taskToUpdate.completedAt = new Date().toISOString();
+    taskToUpdate.workedHours = Date.parse(taskToUpdate.startedAt)  - new Date()
 
     saveToLS(listOfTasks);
     return taskToUpdate;

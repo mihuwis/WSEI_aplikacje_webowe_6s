@@ -8,6 +8,12 @@ export type TaskStatus =
     |"doing"
     |"done";
 
+export type TaskActionResult = 
+    | {success : true; task: Task}
+    | {
+        success : false;
+        reason: "task-not-found" | "user-not-assigned" | "story-not-found" | "user-role-not-allowed";
+    }
 
 export interface Task {
     id: string,
