@@ -51,7 +51,7 @@ const createForStory = (storyId: string, data: CreateTaskDto) : TaskOperationRes
     
     if(!currentStory) return { success: false, reason: "story-not-found" };
     if(data.title.trim() === '') return { success: false, reason: "invalid-title" };
-    if(data.estimatedHours && data.estimatedHours < 0) return {success:false, reason: "invalid-estimated-hours"};
+    if(data.estimatedHours && data.estimatedHours <= 0) return {success:false, reason: "invalid-estimated-hours"};
 
     const newTask : Task = {
         id: uuidv4(),
@@ -111,15 +111,15 @@ const assignUserToTask = (userId: string, taskId: string  ) : TaskOperationResul
     const taskToUpdate = tasks.find(t=> t.id === taskId);
 
     const listOfUsers : User[] = getAllUsers();
-    const assignedUsser = listOfUsers.find(u => u.id === userId)
+    const assignedUser = listOfUsers.find(u => u.id === userId)
 
     const listOfStories : Story[] = storyService.getAllStories();
     const currentStory = listOfStories.find(s => s.id === taskToUpdate?.storyId);
     
 
     if(!taskToUpdate) return { success: false, reason: "task-not-found"}
-    if(!assignedUsser) return { success: false, reason: "user-not-assigned" };
-    if(assignedUsser.role !== 'developer' && assignedUsser.role !== 'devops' ) return { success: false, reason: "user-role-not-allowed" };
+    if(!assignedUser) return { success: false, reason: "user-not-assigned" };
+    if(assignedUser.role !== 'developer' && assignedUser.role !== 'devops' ) return { success: false, reason: "user-role-not-allowed" };
     if(!currentStory) return { success: false, reason: "story-not-found" };
     
     taskToUpdate.assignedUserId = userId;

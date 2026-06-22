@@ -1,13 +1,7 @@
+import { AppRouter } from "./app/routes/AppRouter"
 
-function App() {
-
-
+export function App() {
   return (
-    <>
-      <h1>REAKTOWA TEMPLATKA</h1>
-
-    </>
+    <AppRouter />
   )
 }
-
-export default App
