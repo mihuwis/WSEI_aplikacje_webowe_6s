@@ -1,4 +1,4 @@
-import type { Task, CreateTaskDto, UpdateTaskDto, TaskActionResult} from "../types/task.types"
+import type { Task, CreateTaskDto, UpdateTaskDto, TaskOperationResult} from "../types/task.types"
 import { getAllUsers } from "../../users/services/user.service"
 import { storyService } from "../../stories/services/stories.service"
 import { v4 as uuidv4 } from 'uuid'; 
@@ -32,15 +32,27 @@ const getById = (id : string) : Task | undefined => {
     return returnedTask;
 }
 
-const getByStoryId = (storyId: string) : Task[] => {
+const getByStoryId = (storyId: string) : Task[] | undefined => {
     const listOfTasks : Task[]  = getAll();
     const listOfTasksInStory = listOfTasks.filter(s => s.storyId === storyId);
+
+    const listOfStories : Story[] = storyService.getAllStories();
+    const curentStory = listOfStories.find(s=>s.id === storyId);
+    if(!curentStory) return undefined;
+
     return listOfTasksInStory;
 }
 
-const createForStory = (storyId: string, data: CreateTaskDto) : Task => {
+const createForStory = (storyId: string, data: CreateTaskDto) : TaskOperationResult => {
 
     const currentListOfTasks = getAll();
+    const listOfStories : Story[] = storyService.getAllStories();
+    const currentStory: Story | undefined = listOfStories.find(s=>s.id === storyId);
+    
+    if(!currentStory) return { success: false, reason: "story-not-found" };
+    if(data.title.trim() === '') return { success: false, reason: "invalid-title" };
+    if(data.estimatedHours && data.estimatedHours < 0) return {success:false, reason: "invalid-estimated-hours"};
+
     const newTask : Task = {
         id: uuidv4(),
         title: data.title,
@@ -55,7 +67,7 @@ const createForStory = (storyId: string, data: CreateTaskDto) : Task => {
     }
     currentListOfTasks.push(newTask);
     saveToLS(currentListOfTasks);
-    return newTask;
+    return {success: true, task: newTask};
 }
 
 const update = (id: string, data: UpdateTaskDto): Task | undefined => {
@@ -89,7 +101,7 @@ const deleteById = (id: string): Task[] => {
 };
 
 
-const assignUserToTask = (userId: string, taskId: string  ) : TaskActionResult => {
+const assignUserToTask = (userId: string, taskId: string  ) : TaskOperationResult => {
     // przypisanie użytkownika ma automatycznie:
 
     // status = "doing"
@@ -108,7 +120,7 @@ const assignUserToTask = (userId: string, taskId: string  ) : TaskActionResult =
     if(!taskToUpdate) return { success: false, reason: "task-not-found"}
     if(!assignedUsser) return { success: false, reason: "user-not-assigned" };
     if(assignedUsser.role !== 'developer' && assignedUsser.role !== 'devops' ) return { success: false, reason: "user-role-not-allowed" };
-    if(!currentStory) return { success: false, reason: "story-not-found" }
+    if(!currentStory) return { success: false, reason: "story-not-found" };
     
     taskToUpdate.assignedUserId = userId;
     taskToUpdate.status = 'doing';
@@ -125,7 +137,7 @@ const assignUserToTask = (userId: string, taskId: string  ) : TaskActionResult =
 
 };
 
-const markTaskAsDone = (taskId: string ) : TaskActionResult => {
+const markTaskAsDone = (taskId: string ) : TaskOperationResult => {
     //status = "done"
    // completedAt = now
 
@@ -145,7 +157,7 @@ const markTaskAsDone = (taskId: string ) : TaskActionResult => {
     }
 
     const listOfTasksFromCurrentStory : Task[] = listOfTasks.filter(task=> task.storyId === taskToUpdate.storyId);
-    const allTaskinStoryDone = listOfTasksFromCurrentStory.every(t=> t.status = 'done');
+    const allTaskinStoryDone = listOfTasksFromCurrentStory.every(t=> t.status === 'done');
 
     if(allTaskinStoryDone){
         storyService.updateStory(taskToUpdate.storyId, {status: "done"})

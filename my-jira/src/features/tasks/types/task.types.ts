@@ -8,13 +8,26 @@ export type TaskStatus =
     |"doing"
     |"done";
 
-export type TaskActionResult = 
-    | {success : true; task: Task}
+export type TaskOperationResult =
     | {
-        success : false;
-        reason: "task-not-found" | "user-not-assigned" | "story-not-found" | "user-role-not-allowed";
-    }
+        success: true;
+        task: Task;
+        }
+    | {
+        success: false;
+        reason: TaskErrorReason;
+        };
 
+export type TaskErrorReason =
+    | "task-not-found"
+    | "story-not-found"
+    | "user-not-found"
+    | "user-not-assigned"
+    | "user-role-not-allowed"
+    | "invalid-title"
+    | "invalid-description"
+    | "invalid-estimated-hours"
+    | "no-fields-to-update";
 export interface Task {
     id: string,
     title: string,
