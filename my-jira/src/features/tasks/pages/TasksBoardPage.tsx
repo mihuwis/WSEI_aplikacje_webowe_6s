@@ -1,3 +1,3 @@
-export function TaskDetailsPage() {
+export function TasksBoardPage() {
   return <h1>Taski board</h1>;
 }

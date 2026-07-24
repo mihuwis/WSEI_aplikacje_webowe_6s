@@ -10,10 +10,10 @@ export function AppLayout({ children }: AppLayoutProps){
     return (
         <div>
             <header>
-                Top navigation label
+                Mini-Jira <a href="/projects">Projects</a>
             </header>
                 {children}
-            </div>
+        </div>
 
 
     )
