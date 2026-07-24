@@ -6,7 +6,7 @@ type AppLayoutProps = {
   children: ReactNode;
 };
 
-var currentUser : User = userService.getCurrentUser();
+const currentUser = userService.getCurrentUser();
 
 
 export function AppLayout({ children }: AppLayoutProps){

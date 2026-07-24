@@ -1,4 +1,5 @@
-import { ProjectDetailsPage } from "./ProjectDetailsPage";
+import { Link } from "react-router-dom";
+import type { Project } from "../types/project.types";
 
 const demoProjects: Project[] = [
   {
@@ -16,8 +17,8 @@ const demoProjects: Project[] = [
 export function ProjectsPage(){
     return (<div> Project list 
             <ul>
-                {demoProjects.map((project, index) => (
-                    <li key={index}><a href={project.id}> {project.name}</a></li>
+                {demoProjects.map((project) => (
+                    <li key={project.id}><Link to={`/projects/${project.id}/board`}> {project.name}</Link></li>
                 ))}
             </ul>
     </div>
