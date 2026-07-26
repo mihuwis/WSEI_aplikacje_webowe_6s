@@ -1,80 +1,87 @@
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { db } from "../../../app/firebase/firebase";
 import { userService } from "../../users/services/user.service";
-import type { Story, CreateStoryDto, UpdateStoryDto} from "../types/story.types"
-import { v4 as uuidv4 } from 'uuid'; 
+import type { Story, CreateStoryDto, UpdateStoryDto } from "../types/story.types";
 
-const STORY_STORAGE_KEY : string = "little-jira-stories";
+const STORIES_COLLECTION = "stories";
 
-const readFromLS = () :Story[] => {
-    const storedStories = localStorage.getItem(STORY_STORAGE_KEY);
-    if (!storedStories){
-        return []
-    } else{
-        const parsedStories : Story[] = JSON.parse(storedStories);
-        return parsedStories
-    }
+const mapStoryDocument = (documentId: string, data: unknown): Story => ({
+  ...(data as Omit<Story, "id">),
+  id: documentId,
+});
 
-}
+export const getAllStories = async (): Promise<Story[]> => {
+  const snapshot = await getDocs(collection(db, STORIES_COLLECTION));
 
-const saveToLS = (listOfStories: Story[]) => {
-    localStorage.setItem(STORY_STORAGE_KEY, JSON.stringify(listOfStories))
-}
+  return snapshot.docs.map((document) => mapStoryDocument(document.id, document.data()));
+};
 
-export const getAllStories = () : Story[] =>{
-    return readFromLS();
-}
+const getById = async (id: string): Promise<Story | undefined> => {
+  const snapshot = await getDoc(doc(db, STORIES_COLLECTION, id));
 
-const getById = (id : string) : Story | undefined => { 
-    const listOfStories = readFromLS();
-    const returnedStory = listOfStories.find(o => o.id === id);
-    return returnedStory;
-}
+  if (!snapshot.exists()) {
+    return undefined;
+  }
 
-const getByProjectId = (projectId: string) : Story[]=> {
-    const listOfStories : Story[]  = getAllStories();
-    const listOfStoriesInProject = listOfStories.filter(s => s.projectId === projectId);
-    return listOfStoriesInProject;
-}
+  return mapStoryDocument(snapshot.id, snapshot.data());
+};
 
-const createForProject = (projectId: string, data: CreateStoryDto) : Story => {
+const getByProjectId = async (projectId: string): Promise<Story[]> => {
+  const storiesQuery = query(
+    collection(db, STORIES_COLLECTION),
+    where("projectId", "==", projectId),
+  );
+  const snapshot = await getDocs(storiesQuery);
 
-    const currentListOfStories = getAllStories();
-    const newStory : Story = {
-        id: uuidv4(),
-        name: data.name,
-        description: data.description,
-        projectId: projectId,
-        priority: data.priority,
-        createdAt: new Date().toISOString(),
-        status: "todo",
-        ownerId: userService.getCurrentUser().id
-    }
-    currentListOfStories.push(newStory);
-    saveToLS(currentListOfStories);
-    return newStory;
-}
+  return snapshot.docs.map((document) => mapStoryDocument(document.id, document.data()));
+};
 
-const updateStory = (id:string, data: UpdateStoryDto) : Story | undefined=> {
-    // pobranie z LS calosci 
-    const currentListOfStories : Story[] = getAllStories();
-    const storyToUpdate = currentListOfStories.find(story => story.id === id);
+const createForProject = async (projectId: string, data: CreateStoryDto): Promise<Story> => {
+  const storyRef = doc(collection(db, STORIES_COLLECTION));
+  const newStory: Story = {
+    id: storyRef.id,
+    name: data.name,
+    description: data.description,
+    projectId,
+    priority: data.priority,
+    createdAt: new Date().toISOString(),
+    status: "todo",
+    ownerId: userService.getCurrentUser().id,
+  };
 
-    if(storyToUpdate === undefined) return undefined;
+  await setDoc(storyRef, newStory);
 
-    if(data.name != undefined) storyToUpdate.name = data.name;
-    if(data.description != undefined) storyToUpdate.description = data.description;
-    if(data.priority != undefined) storyToUpdate.priority = data.priority;
-    if(data.status != undefined) storyToUpdate.status = data.status;
+  return newStory;
+};
 
-    saveToLS(currentListOfStories)
-    
-    return storyToUpdate;
-}
+const updateStory = async (id: string, data: UpdateStoryDto): Promise<Story | undefined> => {
+  const currentStory = await getById(id);
 
-const deleteById = (id: string) :Story[] => {
-    const currentListOfStories : Story[] = getAllStories();
-    const newListAfterDeletion =  currentListOfStories.filter(o => o.id !== id);
-    saveToLS(newListAfterDeletion);
-    return newListAfterDeletion;
-}
+  if (!currentStory) {
+    return undefined;
+  }
 
-export const storyService = {getAllStories, getById, getByProjectId, createForProject, updateStory, deleteById}
+  const updatedStory: Story = {
+    ...currentStory,
+    ...data,
+  };
+
+  await setDoc(doc(db, STORIES_COLLECTION, id), updatedStory);
+
+  return updatedStory;
+};
+
+const deleteById = async (id: string): Promise<Story[]> => {
+  await deleteDoc(doc(db, STORIES_COLLECTION, id));
+
+  return getAllStories();
+};
+
+export const storyService = {
+  getAllStories,
+  getById,
+  getByProjectId,
+  createForProject,
+  updateStory,
+  deleteById,
+};

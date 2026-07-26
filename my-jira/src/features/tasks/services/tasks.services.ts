@@ -1,170 +1,182 @@
-import type { Task, CreateTaskDto, UpdateTaskDto, TaskOperationResult} from "../types/task.types"
-import { getAllUsers } from "../../users/services/user.service"
-import { storyService } from "../../stories/services/stories.service"
-import { v4 as uuidv4 } from 'uuid'; 
-import type { User } from "../../users/types/user.types";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { db } from "../../../app/firebase/firebase";
+import { storyService } from "../../stories/services/stories.service";
+import { getAllUsers } from "../../users/services/user.service";
 import type { Story } from "../../stories/types/story.types";
+import type { User } from "../../users/types/user.types";
+import type { Task, CreateTaskDto, UpdateTaskDto, TaskOperationResult } from "../types/task.types";
 
-const TASK_STORAGE_KEY : string = "little-jira-tasks";
+const TASKS_COLLECTION = "tasks";
 
-const readFromLS = () :Task[] => {
-    const storedTasks = localStorage.getItem(TASK_STORAGE_KEY);
-    if (!storedTasks){
-        return []
-    } else{
-        const parsedTasks : Task[] = JSON.parse(storedTasks);
-        return parsedTasks;
-    }
+const mapTaskDocument = (documentId: string, data: unknown): Task => ({
+  ...(data as Omit<Task, "id">),
+  id: documentId,
+});
 
-}
+const getAll = async (): Promise<Task[]> => {
+  const snapshot = await getDocs(collection(db, TASKS_COLLECTION));
 
-const saveToLS = (listOfTasks: Task[]): void => {
-    localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(listOfTasks))
-}
+  return snapshot.docs.map((document) => mapTaskDocument(document.id, document.data()));
+};
 
-const getAll = () : Task[] =>{
-    return readFromLS();
-}
+const getById = async (id: string): Promise<Task | undefined> => {
+  const snapshot = await getDoc(doc(db, TASKS_COLLECTION, id));
 
-const getById = (id : string) : Task | undefined => { 
-    const listOfTasks = readFromLS();
-    const returnedTask = listOfTasks.find(o => o.id === id);
-    return returnedTask;
-}
+  if (!snapshot.exists()) {
+    return undefined;
+  }
 
-const getByStoryId = (storyId: string) : Task[] | undefined => {
-    const listOfTasks : Task[]  = getAll();
-    const listOfTasksInStory = listOfTasks.filter(s => s.storyId === storyId);
+  return mapTaskDocument(snapshot.id, snapshot.data());
+};
 
-    const listOfStories : Story[] = storyService.getAllStories();
-    const curentStory = listOfStories.find(s=>s.id === storyId);
-    if(!curentStory) return undefined;
+const getByStoryId = async (storyId: string): Promise<Task[]> => {
+  const tasksQuery = query(
+    collection(db, TASKS_COLLECTION),
+    where("storyId", "==", storyId),
+  );
+  const snapshot = await getDocs(tasksQuery);
 
-    return listOfTasksInStory;
-}
+  return snapshot.docs.map((document) => mapTaskDocument(document.id, document.data()));
+};
 
-const createForStory = (storyId: string, data: CreateTaskDto) : TaskOperationResult => {
+const getByProjectId = async (projectId: string): Promise<Task[]> => {
+  const tasksQuery = query(
+    collection(db, TASKS_COLLECTION),
+    where("projectId", "==", projectId),
+  );
+  const snapshot = await getDocs(tasksQuery);
 
-    const currentListOfTasks = getAll();
-    const listOfStories : Story[] = storyService.getAllStories();
-    const currentStory: Story | undefined = listOfStories.find(s=>s.id === storyId);
-    
-    if(!currentStory) return { success: false, reason: "story-not-found" };
-    if(data.title.trim() === '') return { success: false, reason: "invalid-title" };
-    if(data.estimatedHours && data.estimatedHours <= 0) return {success:false, reason: "invalid-estimated-hours"};
+  return snapshot.docs.map((document) => mapTaskDocument(document.id, document.data()));
+};
 
-    const newTask : Task = {
-        id: uuidv4(),
-        title: data.title,
-        description: data.description,
-        priority: data.priority,
-        estimatedHours: data.estimatedHours,
+const createForStory = async (
+  storyId: string,
+  data: CreateTaskDto,
+): Promise<TaskOperationResult> => {
+  const currentStory: Story | undefined = await storyService.getById(storyId);
 
-        storyId: storyId,
-        workedHours: 0,
-        status: "todo",
-        createdAt: new Date().toISOString()
-    }
-    currentListOfTasks.push(newTask);
-    saveToLS(currentListOfTasks);
-    return {success: true, task: newTask};
-}
+  if (!currentStory) return { success: false, reason: "story-not-found" };
+  if (data.title.trim() === "") return { success: false, reason: "invalid-title" };
+  if (data.description.trim() === "") return { success: false, reason: "invalid-description" };
+  if (data.estimatedHours !== undefined && data.estimatedHours <= 0) {
+    return { success: false, reason: "invalid-estimated-hours" };
+  }
 
-const update = (id: string, data: UpdateTaskDto): Task | undefined => {
-  const tasks = readFromLS();
+  const taskRef = doc(collection(db, TASKS_COLLECTION));
+  const newTask: Task = {
+    id: taskRef.id,
+    title: data.title,
+    description: data.description,
+    priority: data.priority,
+    estimatedHours: data.estimatedHours,
+    storyId,
+    projectId: currentStory.projectId,
+    workedHours: 0,
+    status: "todo",
+    createdAt: new Date().toISOString(),
+  };
 
-  const taskToUpdate = tasks.find((task) => task.id === id);
+  await setDoc(taskRef, newTask);
+
+  return { success: true, task: newTask };
+};
+
+const update = async (id: string, data: UpdateTaskDto): Promise<Task | undefined> => {
+  const taskToUpdate = await getById(id);
 
   if (!taskToUpdate) {
     return undefined;
   }
 
-  if (data.title !== undefined) taskToUpdate.title = data.title;
-  if (data.description !== undefined) taskToUpdate.description = data.description;
-  if (data.priority !== undefined) taskToUpdate.priority = data.priority;
-  if (data.estimatedHours !== undefined) taskToUpdate.estimatedHours = data.estimatedHours;
-  if (data.workedHours !== undefined) taskToUpdate.workedHours = data.workedHours;
+  const updatedTask: Task = {
+    ...taskToUpdate,
+    ...data,
+  };
 
-  saveToLS(tasks);
+  await setDoc(doc(db, TASKS_COLLECTION, id), updatedTask);
 
-  return taskToUpdate;
+  return updatedTask;
 };
 
-const deleteById = (id: string): Task[] => {
-  const tasks = readFromLS();
+const deleteById = async (id: string): Promise<Task[]> => {
+  await deleteDoc(doc(db, TASKS_COLLECTION, id));
 
-  const tasksAfterDeletion = tasks.filter((task) => task.id !== id);
-
-  saveToLS(tasksAfterDeletion);
-
-  return tasksAfterDeletion;
+  return getAll();
 };
 
+const assignUserToTask = async (
+  userId: string,
+  taskId: string,
+): Promise<TaskOperationResult> => {
+  const taskToUpdate = await getById(taskId);
+  const listOfUsers: User[] = getAllUsers();
+  const assignedUser = listOfUsers.find((user) => user.id === userId);
+  const currentStory = taskToUpdate ? await storyService.getById(taskToUpdate.storyId) : undefined;
 
-const assignUserToTask = (userId: string, taskId: string  ) : TaskOperationResult => {
-    // przypisanie użytkownika ma automatycznie:
+  if (!taskToUpdate) return { success: false, reason: "task-not-found" };
+  if (!assignedUser) return { success: false, reason: "user-not-found" };
+  if (assignedUser.role !== "developer" && assignedUser.role !== "devops") {
+    return { success: false, reason: "user-role-not-allowed" };
+  }
+  if (!currentStory) return { success: false, reason: "story-not-found" };
 
-    // status = "doing"
-    // startedAt = now
-    // assignedUserId = userId
-    const tasks = readFromLS();
-    const taskToUpdate = tasks.find(t=> t.id === taskId);
+  const updatedTask: Task = {
+    ...taskToUpdate,
+    assignedUserId: userId,
+    status: "doing",
+    startedAt: taskToUpdate.startedAt ?? new Date().toISOString(),
+  };
 
-    const listOfUsers : User[] = getAllUsers();
-    const assignedUser = listOfUsers.find(u => u.id === userId)
+  await setDoc(doc(db, TASKS_COLLECTION, taskId), updatedTask);
 
-    const listOfStories : Story[] = storyService.getAllStories();
-    const currentStory = listOfStories.find(s => s.id === taskToUpdate?.storyId);
-    
+  if (currentStory.status === "todo") {
+    await storyService.updateStory(currentStory.id, { status: "doing" });
+  }
 
-    if(!taskToUpdate) return { success: false, reason: "task-not-found"}
-    if(!assignedUser) return { success: false, reason: "user-not-assigned" };
-    if(assignedUser.role !== 'developer' && assignedUser.role !== 'devops' ) return { success: false, reason: "user-role-not-allowed" };
-    if(!currentStory) return { success: false, reason: "story-not-found" };
-    
-    taskToUpdate.assignedUserId = userId;
-    taskToUpdate.status = 'doing';
-    if(! taskToUpdate.startedAt){
-        taskToUpdate.startedAt = new Date().toISOString();
-    }
-
-    if(currentStory.status === 'todo'){
-        storyService.updateStory(currentStory.id, {status: "doing"})
-    }
-
-    saveToLS(tasks);
-    return {success: true, task: taskToUpdate}
-
+  return { success: true, task: updatedTask };
 };
 
-const markTaskAsDone = (taskId: string ) : TaskOperationResult => {
-    //status = "done"
-   // completedAt = now
+const markTaskAsDone = async (taskId: string): Promise<TaskOperationResult> => {
+  const taskToUpdate = await getById(taskId);
 
-    const listOfTasks = readFromLS();
-    const taskToUpdate = listOfTasks.find(t=>t.id===taskId);
+  if (taskToUpdate === undefined) return { success: false, reason: "task-not-found" };
+  if (!taskToUpdate.assignedUserId) return { success: false, reason: "user-not-assigned" };
 
-    if(taskToUpdate === undefined) return { success: false, reason: "task-not-found"};
-    if(!taskToUpdate.assignedUserId) return { success: false, reason: "user-not-assigned" };
+  if (taskToUpdate.status === "done") {
+    return { success: true, task: taskToUpdate };
+  }
 
-    taskToUpdate.status = 'done';
-    taskToUpdate.completedAt = new Date().toISOString();
-    if (taskToUpdate.startedAt){
-        const miliseconds =  Date.parse(taskToUpdate.completedAt) -  Date.parse(taskToUpdate.startedAt)
-        taskToUpdate.workedHours = Math.round((miliseconds / 3600000) *100)/100; 
-    } else{
-        taskToUpdate.workedHours = 0;
-    }
+  const completedAt = new Date().toISOString();
+  const workedHours = taskToUpdate.startedAt
+    ? Math.round(((Date.parse(completedAt) - Date.parse(taskToUpdate.startedAt)) / 3600000) * 100) / 100
+    : 0;
+  const updatedTask: Task = {
+    ...taskToUpdate,
+    status: "done",
+    completedAt,
+    workedHours,
+  };
 
-    const listOfTasksFromCurrentStory : Task[] = listOfTasks.filter(task=> task.storyId === taskToUpdate.storyId);
-    const allTaskinStoryDone = listOfTasksFromCurrentStory.every(t=> t.status === 'done');
+  await setDoc(doc(db, TASKS_COLLECTION, taskId), updatedTask);
 
-    if(allTaskinStoryDone){
-        storyService.updateStory(taskToUpdate.storyId, {status: "done"})
-    }
+  const tasksFromCurrentStory: Task[] = await getByStoryId(taskToUpdate.storyId);
+  const allTasksInStoryDone = tasksFromCurrentStory.every((task) => task.status === "done");
 
-    saveToLS(listOfTasks);
-    return {success: true, task: taskToUpdate};
-}
+  if (allTasksInStoryDone) {
+    await storyService.updateStory(taskToUpdate.storyId, { status: "done" });
+  }
 
-export const tasksService = {getAll, getById, getByStoryId, createForStory, update, deleteById, markTaskAsDone, assignUserToTask}
+  return { success: true, task: updatedTask };
+};
+
+export const tasksService = {
+  getAll,
+  getById,
+  getByStoryId,
+  getByProjectId,
+  createForStory,
+  update,
+  deleteById,
+  markTaskAsDone,
+  assignUserToTask,
+};
