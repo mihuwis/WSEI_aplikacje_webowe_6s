@@ -1,91 +1,74 @@
-import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { tasksService } from "../services/tasks.services";
+import { useEffect, useState } from "react";
 import type { Task } from "../types/task.types";
-
-const boardColumns: Array<{ status: Task["status"]; label: string }> = [
-  { status: "todo", label: "TO DO" },
-  { status: "doing", label: "DOING" },
-  { status: "done", label: "DONE" },
-];
+import { projectService } from "../../projects/services/project.service";
+import { tasksService } from "../services/tasks.services";
 
 export function TasksBoardPage() {
   const { projectId } = useParams();
-  const [taskList, setTaskList] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [projectName, setProjectName] = useState<string>("");
+  const [selectedTask, setSelectedTask] = useState<Task | undefined>();
 
   useEffect(() => {
-    if (!projectId) {
-      setIsLoading(false);
-      return;
-    }
-
-    let ignoreResult = false;
-
-    const loadTasks = async () => {
-      try {
-        const loadedTasks = await tasksService.getByProjectId(projectId);
-
-        if (!ignoreResult) {
-          setTaskList(loadedTasks);
-        }
-      } catch {
-        if (!ignoreResult) {
-          setErrorMessage("Nie udało się pobrać zadań projektu.");
-        }
-      } finally {
-        if (!ignoreResult) {
-          setIsLoading(false);
-        }
-      }
+    const fetchTasks = async () => {
+      const tasksData = await tasksService.getByProjectId(projectId as string);
+      const nameOfProject = await projectService.getById(projectId as string);
+      setProjectName(nameOfProject?.name || "Nieznany projekt" );
+      setTasks(tasksData);
     };
-
-    void loadTasks();
-
-    return () => {
-      ignoreResult = true;
-    };
+    if (!projectId) { return; }
+    else { fetchTasks(); }
   }, [projectId]);
 
-  if (!projectId) {
-    return <div>Brakuje ID projektu w adresie.</div>;
-  }
 
-  if (isLoading) {
-    return <div>Ładowanie tablicy...</div>;
-  }
-
-  if (errorMessage) {
-    return <div>{errorMessage}</div>;
-  }
 
   return (
     <div>
-      <h1>Tablica projektu: {projectId}</h1>
+      <h1>Tablica projektu: {projectName}</h1>
+      <section>TO DO
+        <ul>
+          { tasks.filter(task => task.status === "todo").map(task => (
+            <li key={task.id}>
+              <button onClick={() => setSelectedTask(task)}> {task.title}</button>
+              <p>{task.description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section>DOING
+                <ul>
+          { tasks.filter(task => task.status === "doing").map(task => (
+            <li key={task.id}>
+              <Link to={`/projects/${projectId}/tasks/${task.id}`}>{task.title}</Link>
+              <p>{task.description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section>DONE
+                <ul>
+          { tasks.filter(task => task.status === "done").map(task => (
+            <li key={task.id}>
+              <Link to={`/projects/${projectId}/tasks/${task.id}`}>{task.title}</Link>
+              <p>{task.description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-      {boardColumns.map((column) => {
-        const tasksInColumn = taskList.filter((task) => task.status === column.status);
+      <section>
+        {selectedTask &&(
+          <div className="task-window">
+          <Link to={`/projects/${projectId}/tasks/${selectedTask.id}`}>{selectedTask.title}</Link>
+            <div>{selectedTask.description}</div>
+            <div>{selectedTask.status}</div>
+            <div>{selectedTask.estimatedHours}</div>
+            <div>{selectedTask.workedHours}</div>
 
-        return (
-          <section key={column.status}>
-            <h2>{column.label}</h2>
-            {tasksInColumn.length === 0 ? (
-              <p>Brak zadań.</p>
-            ) : (
-              <ul>
-                {tasksInColumn.map((task) => (
-                  <li key={task.id}>
-                    <Link to={`/projects/${projectId}/stories/${task.storyId}/tasks/${task.id}`}>
-                      {task.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        );
-      })}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
