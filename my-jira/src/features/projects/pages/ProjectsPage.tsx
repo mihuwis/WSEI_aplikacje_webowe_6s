@@ -37,24 +37,34 @@ export function ProjectsPage() {
   }, []);
 
   if (isLoading) {
-    return <div>Ładowanie projektów...</div>;
+    return <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">Ładowanie projektów...</div>;
   }
 
   if (errorMessage) {
-    return <div>{errorMessage}</div>;
+    return <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-red-700">{errorMessage}</div>;
   }
 
   return (
-    <div>
-      <h1>Projekty</h1>
+    <div className="space-y-6">
+      <div>
+        <p className="text-sm font-medium uppercase tracking-wide text-slate-500">Workspace</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Projekty</h1>
+      </div>
 
       {projects.length === 0 ? (
-        <p>Brak projektów w bazie.</p>
+        <p className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">Brak projektów w bazie.</p>
       ) : (
-        <ul>
+        <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((project) => (
             <li key={project.id}>
-              <Link to={`/projects/${project.id}/board`}>{project.name}</Link>
+              <Link
+                className="block min-h-36 rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+                to={`/projects/${project.id}/board`}
+              >
+                <h2 className="text-lg font-semibold text-slate-950">{project.name}</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{project.description}</p>
+                <p className="mt-5 text-sm font-medium text-blue-600">Otwórz tablicę</p>
+              </Link>
             </li>
           ))}
         </ul>

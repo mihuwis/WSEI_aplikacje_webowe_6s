@@ -1,3 +1,21 @@
+import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { tasksService } from "../services/tasks.services";
+
 export function TaskDetailsPage() {
-  return <h1>Taski</h1>;
+
+  const { selectedTask } = useParams();
+
+  useEffect(() => {
+    const fetchTask = async => {
+            const taskData = await tasksService.getById(selectedTask as string);
+    }
+  }, [selectedTask]);
+
+  return (
+    <div className="space-y-6">
+
+
+    </div>
+  );
 }
