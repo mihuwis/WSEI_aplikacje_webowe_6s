@@ -1,12 +1,15 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Task } from "../types/task.types";
+import type { Story } from "../../stories/types/story.types";
 import { projectService } from "../../projects/services/project.service";
 import { tasksService } from "../services/tasks.services";
+import { storyService } from "../../stories/services/stories.service";
 
 export function TasksBoardPage() {
   const { projectId } = useParams();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [stories, setStory] = useState<Story[]>([]);
   const [projectName, setProjectName] = useState<string>("");
   const [selectedTask, setSelectedTask] = useState<Task | undefined>();
 
@@ -14,6 +17,8 @@ export function TasksBoardPage() {
     const fetchTasks = async () => {
       const tasksData = await tasksService.getByProjectId(projectId as string);
       const nameOfProject = await projectService.getById(projectId as string);
+      const storiesData = await storyService.getByProjectId(projectId as string);
+      setStory(storiesData);
       setProjectName(nameOfProject?.name || "Nieznany projekt" );
       setTasks(tasksData);
     };
@@ -21,6 +26,10 @@ export function TasksBoardPage() {
     else { fetchTasks(); }
   }, [projectId]);
 
+  const getStoryNameByID = (storyId: string) => {
+    const storyToFind = stories.find(story => story.id === storyId);
+    return storyToFind ? storyToFind.name : "Nieznana historia";
+  }
 
 
   return (
@@ -28,6 +37,10 @@ export function TasksBoardPage() {
       <div>
         <p className="text-sm font-medium uppercase tracking-wide text-slate-500">Tablica projektu</p>
         <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{projectName}</h1>
+        <Link className="mt-1 block text-xl font-semibold leading-7 text-slate-950 hover:text-blue-600"
+                  to={`/projects/${projectId}/tasks/new`}
+                >Add Task
+        </Link>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
@@ -46,6 +59,7 @@ export function TasksBoardPage() {
                     <p className="mt-2 line-clamp-2 text-sm leading-5 text-slate-600">{task.description}</p>
                     <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
                       <span className="rounded-full bg-amber-100 px-2 py-1 font-medium text-amber-700">{task.priority}</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">{getStoryNameByID(task.storyId)}</span>
                       <span>{task.estimatedHours ?? "-"}h</span>
                     </div>
                   </li>
@@ -67,6 +81,7 @@ export function TasksBoardPage() {
                     <p className="mt-2 line-clamp-2 text-sm leading-5 text-slate-600">{task.description}</p>
                     <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
                       <span className="rounded-full bg-blue-100 px-2 py-1 font-medium text-blue-700">{task.priority}</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">{getStoryNameByID(task.storyId)}</span>
                       <span>{task.estimatedHours ?? "-"}h</span>
                     </div>
                 </li>
@@ -88,6 +103,7 @@ export function TasksBoardPage() {
                   <p className="mt-2 line-clamp-2 text-sm leading-5 text-slate-600">{task.description}</p>
                   <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
                     <span className="rounded-full bg-emerald-100 px-2 py-1 font-medium text-emerald-700">{task.priority}</span>
+                    <span className="rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">{getStoryNameByID(task.storyId)}</span>
                     <span>{task.workedHours ?? 0}h done</span>
                   </div>
                 </li>
