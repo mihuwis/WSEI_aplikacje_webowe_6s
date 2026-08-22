@@ -1,79 +1,65 @@
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
+import { db } from "../../../app/firebase/firebase";
 import type { Project, CreateProjectDto, UpdateProjectDto } from "../types/project.types";
-import { v4 as uuidv4 } from 'uuid'; 
 
-const PROJECTS_STORAGE_KEY : string = "little-jira-projects";
+const PROJECTS_COLLECTION = "projects";
 
-const readFromLS  = () : Project[] => {
-    const storedProjects = localStorage.getItem(PROJECTS_STORAGE_KEY);
-    if(!storedProjects){
-        return []
-    } else {
-        const parsedProjects : Project[] = JSON.parse(storedProjects);
-        return parsedProjects ;
-    }
-    
-}
+const getAll = async (): Promise<Project[]> => {
+  const snapshot = await getDocs(collection(db, PROJECTS_COLLECTION));
 
-const saveToLS = (listOfProjects : Project[]) : void => { 
-    localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(listOfProjects))
-}
+  return snapshot.docs.map((document) => ({
+    ...(document.data() as Omit<Project, "id">),
+    id: document.id,
+  }));
+};
 
+const getById = async (id: string): Promise<Project | undefined> => {
+  const snapshot = await getDoc(doc(db, PROJECTS_COLLECTION, id));
 
-// CRUD 
+  if (!snapshot.exists()) {
+    return undefined;
+  }
 
-const getAll = () : Project[] =>{
-    return readFromLS();
-}
+  return {
+    ...(snapshot.data() as Omit<Project, "id">),
+    id: snapshot.id,
+  };
+};
 
-const getById = (id : string) : Project | undefined => { 
-    const listOfProjects = readFromLS();
-    const returnedProject = listOfProjects.find(o => o.id === id);
-    return returnedProject;
-}
+const create = async (data: CreateProjectDto): Promise<Project> => {
+  const projectRef = doc(collection(db, PROJECTS_COLLECTION));
+  const newProject: Project = {
+    id: projectRef.id,
+    name: data.name,
+    description: data.description,
+  };
 
-const create = (data: CreateProjectDto) : Project => {
-    // pobranie z LS calosci 
-    const currentListOfProjects : Project[] = getAll();
-    // Tworzenie nowego obiektu
-    const newProject : Project = { id : uuidv4(), name: data.name, description: data.description}
-    // dodanei do starej listy projektow
-    currentListOfProjects.push(newProject);
-    // save do LS
-    saveToLS(currentListOfProjects);
-    return newProject;
+  await setDoc(projectRef, newProject);
 
-}
+  return newProject;
+};
 
-const update = (id:string, data: UpdateProjectDto) : Project | undefined=> {
-    // pobranie z LS calosci 
-    const currentListOfProjects : Project[] = getAll();
+const update = async (id: string, data: UpdateProjectDto): Promise<Project | undefined> => {
+  const currentProject = await getById(id);
 
-    const projectToUpdate = currentListOfProjects.find(o=> o.id === id);
-    if(!projectToUpdate) return undefined;
+  if (!currentProject) {
+    return undefined;
+  }
 
-    if(data.name !== undefined) {
-        const trimmedName = data.name.trim();
-        if (!trimmedName){
-            throw new Error("Project name cannot be empty")
-        }
-        projectToUpdate.name = trimmedName;
-    } 
-    if(data.description) projectToUpdate.description = data.description;
+  const updatedProject: Project = {
+    ...currentProject,
+    ...data,
+  };
 
-    saveToLS(currentListOfProjects)
+  await setDoc(doc(db, PROJECTS_COLLECTION, id), updatedProject);
 
-    return projectToUpdate;
-}
+  return updatedProject;
+};
 
-const deleteById = (id: string) :Project[] => {
-        // pobranie z LS calosci 
-    const currentListOfProjects : Project[] = getAll();
+const deleteById = async (id: string): Promise<Project[]> => {
+  await deleteDoc(doc(db, PROJECTS_COLLECTION, id));
 
-    const newListAfterDeletion =  currentListOfProjects.filter(o => o.id !== id);
+  return getAll();
+};
 
-    saveToLS(newListAfterDeletion);
-
-    return newListAfterDeletion;
-}
-
-export const projectService = {getAll, getById, create, update, deleteById}
+export const projectService = { getAll, getById, create, update, deleteById };

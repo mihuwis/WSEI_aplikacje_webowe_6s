@@ -3,7 +3,7 @@ import { ProjectsPage } from '../../features/projects/pages/ProjectsPage';
 import { ProjectDetailsPage } from '../../features/projects/pages/ProjectDetailsPage';
 import { StoryDetailsPage } from '../../features/stories/pages/StoryDetailsPage';
 import { ROUTES } from './routes.constants';
-
+import { AddTaskPage } from '../../features/tasks/pages/AddTaskPage';
 import { AppLayout } from '../layout/AppLayout';
 import { TaskDetailsPage } from '../../features/tasks/pages/TaskDetailsPage';
 
@@ -21,6 +21,7 @@ export function AppRouter() {
           <Route path={ROUTES.projectDetails} element={<ProjectDetailsPage />} />
           <Route path={ROUTES.storyDetails} element={<StoryDetailsPage />}/>
           <Route path={ROUTES.taskDetails} element={<TaskDetailsPage />}/>
+          <Route path={ROUTES.addTask} element={<AddTaskPage />}/>
           <Route path={ROUTES.storyDetails} element={<StoryDetailsPage />}/>
         </Routes>
       </AppLayout>

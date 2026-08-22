@@ -19,6 +19,8 @@ JSON.stringify(Project[])
 Repo prowadzącego 
 https://github.com/rbrzegowy/S-Programowanie-aplikacji-webowych/tree/main/laboratoria/lab%201
 
+https://console.firebase.google.com/project/my-jira-dev/firestore/databases/-default-/data/~2Fprojects~2Fproject-1
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
