@@ -110,7 +110,7 @@ const assignUserToTask = async (
 ): Promise<TaskOperationResult> => {
   const taskToUpdate = await getById(taskId);
   const listOfUsers: User[] = getAllUsers();
-  const assignedUser = listOfUsers.find((user) => user.id === userId);
+  const assignedUser = listOfUsers.find((user) => user.uid === userId);
   const currentStory = taskToUpdate ? await storyService.getById(taskToUpdate.storyId) : undefined;
 
   if (!taskToUpdate) return { success: false, reason: "task-not-found" };

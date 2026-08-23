@@ -1,8 +1,8 @@
 export interface User {
-    id: string,
+    uid: string,
     firstName: string,
     lastName: string,
     role: UserRole
 }
 
-export type UserRole = "admin" | "devops" | "developer"
+export type UserRole = "admin" | "devops" | "developer" | "guest"

@@ -7,8 +7,7 @@ import { AddTaskPage } from '../../features/tasks/pages/AddTaskPage';
 import { AppLayout } from '../layout/AppLayout';
 import { TaskDetailsPage } from '../../features/tasks/pages/TaskDetailsPage';
 import { StoryBoardPage } from '../../features/stories/pages/StoryBoardPage';
-import { TasksBoardPage } from '../../features/tasks/pages/TasksBoardPage';
-    
+
 
 export function AppRouter() {
     return (

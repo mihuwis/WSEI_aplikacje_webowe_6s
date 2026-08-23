@@ -46,7 +46,7 @@ const createForProject = async (projectId: string, data: CreateStoryDto): Promis
     priority: data.priority,
     createdAt: new Date().toISOString(),
     status: "todo",
-    ownerId: userService.getCurrentUser().id,
+    ownerId: userService.getCurrentUser().uid,
   };
 
   await setDoc(storyRef, newStory);

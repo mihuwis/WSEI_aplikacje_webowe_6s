@@ -1,16 +1,16 @@
 import type { User } from "../types/user.types";
 
 const MOCK_USER_1_ADMIN: User = {
-    id:"123", firstName:"Jan", lastName:"Nowak", role: "admin"
+    uid:"123", firstName:"Jan", lastName:"Nowak", role: "admin"
 }
 const MOCK_USER_2_ADMIN: User = {
-    id:"125", firstName:"Sybilla", lastName:"Kociupko", role: "admin"
+    uid:"125", firstName:"Sybilla", lastName:"Kociupko", role: "admin"
 }
 const MOCK_USER_3_DEVOPS: User = {
-    id:"127", firstName:"Greg", lastName:"Kociupko", role: "devops"
+    uid:"127", firstName:"Greg", lastName:"Kociupko", role: "devops"
 }
 const MOCK_USER_4_DEVELOPER: User = {
-    id:"129", firstName:"Mat", lastName:"Bed", role: "developer"
+    uid:"129", firstName:"Mat", lastName:"Bed", role: "developer"
 }
 
 const LIST_OF_MOCK_USERS : User[] =
