@@ -6,7 +6,7 @@ import { ROUTES } from './routes.constants';
 import { AddTaskPage } from '../../features/tasks/pages/AddTaskPage';
 import { AppLayout } from '../layout/AppLayout';
 import { TaskDetailsPage } from '../../features/tasks/pages/TaskDetailsPage';
-
+import { StoryBoardPage } from '../../features/stories/pages/StoryBoardPage';
 import { TasksBoardPage } from '../../features/tasks/pages/TasksBoardPage';
     
 
@@ -17,7 +17,7 @@ export function AppRouter() {
         <Routes>
           <Route path={ROUTES.home} element={<Navigate to={ROUTES.projects} replace />}/>
           <Route path={ROUTES.projects} element={<ProjectsPage />} />
-          <Route path={ROUTES.projectBoard} element={<TasksBoardPage />} />
+          <Route path={ROUTES.storyBoard} element={<StoryBoardPage />} />
           <Route path={ROUTES.projectDetails} element={<ProjectDetailsPage />} />
           <Route path={ROUTES.storyDetails} element={<StoryDetailsPage />}/>
           <Route path={ROUTES.taskDetails} element={<TaskDetailsPage />}/>

@@ -59,7 +59,7 @@ export function ProjectsPage() {
             <li key={project.id}>
               <Link
                 className="block min-h-36 rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
-                to={`/projects/${project.id}/board`}
+                to={`/projects/${project.id}/stories`}
               >
                 <h2 className="text-lg font-semibold text-slate-950">{project.name}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{project.description}</p>
