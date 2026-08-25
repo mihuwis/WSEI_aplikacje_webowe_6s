@@ -7,6 +7,7 @@ import { AddTaskPage } from '../../features/tasks/pages/AddTaskPage';
 import { AppLayout } from '../layout/AppLayout';
 import { TaskDetailsPage } from '../../features/tasks/pages/TaskDetailsPage';
 import { StoryBoardPage } from '../../features/stories/pages/StoryBoardPage';
+import { LoginPage } from '../../features/auth/pages/LoginPage';
 
 
 export function AppRouter() {
@@ -21,7 +22,7 @@ export function AppRouter() {
           <Route path={ROUTES.storyDetails} element={<StoryDetailsPage />}/>
           <Route path={ROUTES.taskDetails} element={<TaskDetailsPage />}/>
           <Route path={ROUTES.addTask} element={<AddTaskPage />}/>
-          <Route path={ROUTES.storyDetails} element={<StoryDetailsPage />}/>
+          <Route path={ROUTES.login} element={<LoginPage />}/>
         </Routes>
       </AppLayout>
     </BrowserRouter>

@@ -6,5 +6,6 @@ export const ROUTES = {
   storyDetails: "/projects/:projectId/stories/:storyId",
   taskDetails: "/projects/:projectId/tasks/:taskId",
   addTask: "/projects/:projectId/tasks/new",
+  login: "/login",
   notFound: "*",
 } as const;
