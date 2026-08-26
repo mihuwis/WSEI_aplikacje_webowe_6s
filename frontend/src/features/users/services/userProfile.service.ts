@@ -1,0 +1,70 @@
+import { doc, getDoc, setDoc  } from "firebase/firestore";
+import { db } from "../../../app/firebase/firebase";
+import type {UserProfile} from "../types/user.profile";
+import type { User as FirebaseUser } from "firebase/auth";
+import type { UserRole } from "../types/user.types";
+
+
+const USERS_COLLECTION = "users";
+
+const getByUid = async (uid:string) : Promise<UserProfile | undefined> => {
+    const documentRef = doc(db, USERS_COLLECTION, uid);
+    const documentSnapshot  = await getDoc(documentRef);
+    if(!documentSnapshot.exists()){
+        return undefined;
+    }
+
+    return {
+        ...(documentSnapshot.data() as UserProfile),
+        uid: documentSnapshot.id
+    }
+
+} 
+
+const createFromFireBaseUser = async (firebaseUser: FirebaseUser): Promise<UserProfile> => {
+    if(!firebaseUser.email){
+        throw new Error("user needs mail");
+    }
+
+    const userEmail = firebaseUser.email.trim().toLowerCase();
+    const now = new Date().toISOString();
+
+    const superAdminEmail = 
+        (import.meta.env.VITE_SUPER_ADMIN_EMAIL ?? "")
+        .trim().toLowerCase();
+
+    const role: UserRole = 
+        superAdminEmail !== "" && userEmail === superAdminEmail 
+        ? "admin" : "guest";
+
+    const newProfile: UserProfile = {
+        uid: firebaseUser.uid,
+        email: userEmail,
+        displayName: firebaseUser.displayName ?? userEmail,
+        firstName: "",
+        lastName: "",
+        photoURL: firebaseUser.photoURL,
+        role,
+        isBlocked: false,
+        createdAt: now,
+        updatedAt: now
+    }
+
+    const documentRef = doc(db, USERS_COLLECTION, firebaseUser.uid);
+
+    await setDoc(documentRef, newProfile);
+
+    return newProfile;
+}
+
+const getOrCreate = async (firebaseUser: FirebaseUser): Promise<UserProfile> =>{
+    const existingProfile = await getByUid(firebaseUser.uid);
+
+    if(existingProfile){
+        return existingProfile;
+    }
+
+    return createFromFireBaseUser(firebaseUser);
+}
+
+export const userProfileService = { getByUid, getOrCreate }

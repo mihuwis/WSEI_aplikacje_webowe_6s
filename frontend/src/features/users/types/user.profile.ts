@@ -6,6 +6,7 @@ export interface UserProfile{
     displayName: string,
     firstName: string,
     lastName: string,
+    photoURL: string | null,
     role: UserRole,
     isBlocked: boolean,
     createdAt: string,
