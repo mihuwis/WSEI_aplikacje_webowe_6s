@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { authService } from "../services/auth.services"
 import type { User as FirebaseUser } from "firebase/auth";
+import { userProfileService } from "../../users/services/userProfile.service";
 
 export function LoginPage(){
     const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -9,6 +10,9 @@ export function LoginPage(){
         
         const loggedUser = await authService.signInWithGoogle();
         setUser(loggedUser)
+
+        const userProfile = userProfileService.getOrCreate(loggedUser);
+        console.log(userProfile);
     }
     return(
         <div>
