@@ -7,5 +7,6 @@ export const ROUTES = {
   taskDetails: "/projects/:projectId/tasks/:taskId",
   addTask: "/projects/:projectId/tasks/new",
   login: "/login",
+  accountStatus: "/account-status",
   notFound: "*",
 } as const;

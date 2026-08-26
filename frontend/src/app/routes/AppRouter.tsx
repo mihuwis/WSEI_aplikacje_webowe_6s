@@ -10,26 +10,65 @@ import { StoryBoardPage } from '../../features/stories/pages/StoryBoardPage';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
 import { HomePage } from "../pages/HomePage";
 import { RequireAuth } from "../../features/auth/guards/RequireAuth";
+import { RequireActiveUser } from "../../features/auth/guards/RequireActiveUser";
+import { AccountStatusPage } from "../../features/auth/pages/AccountStatusPage";
 
 
 export function AppRouter() {
     return (
     <BrowserRouter>
-        <Routes>
-          <Route path={ROUTES.home} element={<HomePage />}/>
-          <Route path={ROUTES.login} element={<LoginPage />}/>
-          <Route element={<RequireAuth />}>
-              <Route element={<AppLayout />}>
-                <Route path={ROUTES.projects} element={<ProjectsPage />} />
-                <Route path={ROUTES.storyBoard} element={<StoryBoardPage />} />
-                <Route path={ROUTES.projectDetails} element={<ProjectDetailsPage />} />
-                <Route path={ROUTES.storyDetails} element={<StoryDetailsPage />}/>
-                <Route path={ROUTES.taskDetails} element={<TaskDetailsPage />}/>
-                <Route path={ROUTES.addTask} element={<AddTaskPage />}/>
-              </Route>
-            </Route>
+      <Routes>
+          <Route
+              path={ROUTES.home}
+              element={<HomePage />}
+          />
 
-        </Routes>
+          <Route
+              path={ROUTES.login}
+              element={<LoginPage />}
+          />
+
+          <Route element={<RequireAuth />}>
+              <Route
+                  path={ROUTES.accountStatus}
+                  element={<AccountStatusPage />}
+              />
+
+              <Route element={<RequireActiveUser />}>
+                  <Route element={<AppLayout />}>
+                      <Route
+                          path={ROUTES.projects}
+                          element={<ProjectsPage />}
+                      />
+
+                      <Route
+                          path={ROUTES.storyBoard}
+                          element={<StoryBoardPage />}
+                      />
+
+                      <Route
+                          path={ROUTES.projectDetails}
+                          element={<ProjectDetailsPage />}
+                      />
+
+                      <Route
+                          path={ROUTES.storyDetails}
+                          element={<StoryDetailsPage />}
+                      />
+
+                      <Route
+                          path={ROUTES.taskDetails}
+                          element={<TaskDetailsPage />}
+                      />
+
+                      <Route
+                          path={ROUTES.addTask}
+                          element={<AddTaskPage />}
+                      />
+                  </Route>
+              </Route>
+          </Route>
+      </Routes>
     </BrowserRouter>
     )
 }
