@@ -1,0 +1,31 @@
+# Local agent files
+/.agents/
+
+# Local project plans
+**/PROJECT-PLAN.md
+
+# JavaScript
+**/node_modules/
+**/dist/
+
+# Java
+**/target/
+
+# Local environment
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
