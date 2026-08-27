@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, setDoc, getDocs  } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, getDocs, updateDoc  } from "firebase/firestore";
 import { db } from "../../../app/firebase/firebase";
 import type {UserProfile} from "../types/user.profile";
 import type { User as FirebaseUser } from "firebase/auth";
@@ -31,6 +31,30 @@ const getAll = async () : Promise<UserProfile[]> =>{
         uid: documentSnapshot.id,
     }));
 }
+
+const updateRole = async (
+    uid: string,
+    role: UserRole,
+): Promise<void> => {
+    const documentRef = doc(db, USERS_COLLECTION, uid);
+
+    await updateDoc(documentRef, {
+        role,
+        updatedAt: new Date().toISOString(),
+    });
+};
+
+const updateBlockedStatus = async (
+    uid: string,
+    isBlocked: boolean,
+): Promise<void> => {
+    const documentRef = doc(db, USERS_COLLECTION, uid);
+
+    await updateDoc(documentRef, {
+        isBlocked,
+        updatedAt: new Date().toISOString(),
+    });
+};
 
 const createFromFireBaseUser = async (firebaseUser: FirebaseUser): Promise<UserProfile> => {
     if(!firebaseUser.email){
@@ -78,4 +102,4 @@ const getOrCreate = async (firebaseUser: FirebaseUser): Promise<UserProfile> =>{
     return createFromFireBaseUser(firebaseUser);
 }
 
-export const userProfileService = { getByUid, getOrCreate, getAll }
+export const userProfileService = { getByUid, getOrCreate, getAll, updateRole, updateBlockedStatus }
