@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc  } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, getDocs  } from "firebase/firestore";
 import { db } from "../../../app/firebase/firebase";
 import type {UserProfile} from "../types/user.profile";
 import type { User as FirebaseUser } from "firebase/auth";
@@ -20,6 +20,17 @@ const getByUid = async (uid:string) : Promise<UserProfile | undefined> => {
     }
 
 } 
+
+const getAll = async () : Promise<UserProfile[]> =>{
+    const collectionRef = collection(db, USERS_COLLECTION);
+    const querySnapshot   = await getDocs(collectionRef);
+
+    return querySnapshot.docs.map(
+        (documentSnapshot) => ({
+                    ...(documentSnapshot.data() as UserProfile),
+        uid: documentSnapshot.id,
+    }));
+}
 
 const createFromFireBaseUser = async (firebaseUser: FirebaseUser): Promise<UserProfile> => {
     if(!firebaseUser.email){
@@ -67,4 +78,4 @@ const getOrCreate = async (firebaseUser: FirebaseUser): Promise<UserProfile> =>{
     return createFromFireBaseUser(firebaseUser);
 }
 
-export const userProfileService = { getByUid, getOrCreate }
+export const userProfileService = { getByUid, getOrCreate, getAll }

@@ -12,7 +12,8 @@ import { HomePage } from "../pages/HomePage";
 import { RequireAuth } from "../../features/auth/guards/RequireAuth";
 import { RequireActiveUser } from "../../features/auth/guards/RequireActiveUser";
 import { AccountStatusPage } from "../../features/auth/pages/AccountStatusPage";
-
+import { RequireAdmin } from "../../features/auth/guards/RequireAdmin";
+import { AdminUsersPage } from "../../features/users/pages/AdminUsersPage";
 
 export function AppRouter() {
     return (
@@ -65,6 +66,12 @@ export function AppRouter() {
                           path={ROUTES.addTask}
                           element={<AddTaskPage />}
                       />
+                      <Route element={<RequireAdmin />}>
+                            <Route
+                                path={ROUTES.adminUsers}
+                                element={<AdminUsersPage />}
+    />
+                      </Route>
                   </Route>
               </Route>
           </Route>
