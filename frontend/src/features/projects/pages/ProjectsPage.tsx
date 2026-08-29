@@ -56,15 +56,19 @@ export function ProjectsPage() {
       ) : (
         <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((project) => (
-            <li key={project.id}>
-              <Link
-                className="block min-h-36 rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
-                to={`/projects/${project.id}/stories`}
-              >
+            <li 
+              key={project.id}
+              className="block min-h-36 rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
                 <h2 className="text-lg font-semibold text-slate-950">{project.name}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{project.description}</p>
-                <p className="mt-5 text-sm font-medium text-blue-600">Otwórz tablicę</p>
+              <div className="flex gap-8">
+              <Link className="flex-1 text-center mt-5 text-sm font-medium text-blue-600 hover:text-green-900" to={`/projects/${project.id}/stories`}>
+                Historyjki
               </Link>
+              <Link className="flex-1 text-center mt-5 text-sm font-medium text-blue-600 hover:text-green-900" to={`/projects/${project.id}`}>
+                Detale
+              </Link>
+              </div>
             </li>
           ))}
         </ul>
