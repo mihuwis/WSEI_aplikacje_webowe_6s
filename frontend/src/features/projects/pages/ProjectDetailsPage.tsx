@@ -21,6 +21,9 @@ export function ProjectDetailsPage(){
         }
 
         let ignoreResult = false;
+        setIsLoading(true);
+        setErrorMessage(null);
+        setProject(null);
 
         const loadProject = async() => {
             try{

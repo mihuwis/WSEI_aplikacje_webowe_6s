@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { projectService } from "../services/project.service";
 import type { Project } from "../types/project.types";
+import { ROUTES } from "../../../app/routes/routes.constants";
 
 export function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -46,11 +47,20 @@ export function ProjectsPage() {
 
   return (
     <div className="space-y-6">
+      <div className="space-y-6">
+        <div>
+          <p className="text-sm font-medium uppercase tracking-wide text-slate-500">Workspace</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Projekty</h1>
+        </div>
+        <div>
+          <Link
+            className="mt-5 text-sm font-medium text-blue-600 hover:text-green-900"
+            to={ROUTES.addProject}
+            >Dodaj Projekt
+          </Link>
+        </div>
+      </div>     
       <div>
-        <p className="text-sm font-medium uppercase tracking-wide text-slate-500">Workspace</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Projekty</h1>
-      </div>
-
       {projects.length === 0 ? (
         <p className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">Brak projektów w bazie.</p>
       ) : (
@@ -73,6 +83,7 @@ export function ProjectsPage() {
           ))}
         </ul>
       )}
+      </div>
     </div>
   );
 }

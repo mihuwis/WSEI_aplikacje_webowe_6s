@@ -14,6 +14,7 @@ import { RequireActiveUser } from "../../features/auth/guards/RequireActiveUser"
 import { AccountStatusPage } from "../../features/auth/pages/AccountStatusPage";
 import { RequireAdmin } from "../../features/auth/guards/RequireAdmin";
 import { AdminUsersPage } from "../../features/users/pages/AdminUsersPage";
+import { AddProjectPage } from '../../features/projects/pages/AddProjectPage';
 
 export function AppRouter() {
     return (
@@ -40,6 +41,11 @@ export function AppRouter() {
                       <Route
                           path={ROUTES.projects}
                           element={<ProjectsPage />}
+                      />
+
+                    <Route
+                          path={ROUTES.addProject}
+                          element={<AddProjectPage />}
                       />
 
                       <Route
