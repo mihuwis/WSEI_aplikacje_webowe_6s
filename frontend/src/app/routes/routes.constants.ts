@@ -3,6 +3,7 @@ export const ROUTES = {
   projects: "/projects",
   projectDetails: "/projects/:projectId",
   addProject: "/projects/new",
+  editProject: "/projects/:projectId/edit",
   storyBoard: "/projects/:projectId/stories",
   storyDetails: "/projects/:projectId/stories/:storyId",
   taskDetails: "/projects/:projectId/tasks/:taskId",

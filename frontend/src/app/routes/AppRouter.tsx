@@ -15,6 +15,7 @@ import { AccountStatusPage } from "../../features/auth/pages/AccountStatusPage";
 import { RequireAdmin } from "../../features/auth/guards/RequireAdmin";
 import { AdminUsersPage } from "../../features/users/pages/AdminUsersPage";
 import { AddProjectPage } from '../../features/projects/pages/AddProjectPage';
+import { EditProjectPage } from '../../features/projects/pages/EditProjectPage';
 
 export function AppRouter() {
     return (
@@ -43,9 +44,14 @@ export function AppRouter() {
                           element={<ProjectsPage />}
                       />
 
-                    <Route
+                      <Route
                           path={ROUTES.addProject}
                           element={<AddProjectPage />}
+                      />
+
+                      <Route
+                          path={ROUTES.editProject}
+                          element={<EditProjectPage />}
                       />
 
                       <Route

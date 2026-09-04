@@ -1,5 +1,5 @@
 import { projectService } from "../services/project.service";
-import { Link, useParams, generatePath } from "react-router-dom";
+import { Link, useParams, generatePath, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Project } from "../types/project.types";
 import { ROUTES } from "../../../app/routes/routes.constants";
@@ -10,6 +10,9 @@ export function ProjectDetailsPage(){
     const [ project, setProject ] = useState<Project | null>(null);
     const [ errorMessage, setErrorMessage ] = useState<string | null>(null);
     const [ isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
+    const [ isDeleting, setIsDeleting] = useState(false);
+    const [ deleteErrorMessage, setDeleteErrorMessage ] = useState<string | null>(null);
 
 
     useEffect(()=>{
@@ -65,15 +68,53 @@ export function ProjectDetailsPage(){
         return <p>„Brak danych projektu”</p>
     }
 
+    const handleDelete = async() => {
+        const confirmed = window.confirm("Wywalamy?");
+
+        if (!confirmed) {
+        return;
+        }
+
+        try {
+            setIsDeleting(true);
+            setDeleteErrorMessage(null);
+
+            await projectService.deleteById(project.id);
+            navigate(ROUTES.projects, {replace: true});
+
+        } catch (error: unknown){
+            console.error(error);
+            setDeleteErrorMessage(
+                "Nie udało się usunąć projektu.",
+            );
+        } finally {
+            setIsDeleting(false);
+        }
+
+
+
+        
+    }
+
     return (
-        <div>
+        <div className="space-y-12">
             <Link
                 className="text-sm font-medium text-blue-600 hover:text-green-900" 
                 to={ ROUTES.projects}>
-                Wróc do Projektów</Link>
+                Wróc do Projektów
+            </Link>
+
             <div>
                 <h1>{project.name}</h1>
                 <p>{project.description}</p>
+                <Link
+                    className="text-sm font-medium text-blue-600 hover:text-green-900"
+                    to={generatePath(ROUTES.editProject, {
+                        projectId: project.id,
+                    })}
+                >
+                    Edytuj projekt
+                </Link>
                 <Link 
                     className="text-sm font-medium text-blue-600 hover:text-green-900" 
                     to={generatePath(ROUTES.storyBoard, {
@@ -82,6 +123,14 @@ export function ProjectDetailsPage(){
                     Historyjki
               </Link>
             </div>
+            <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => void handleDelete()}
+                className="cursor-pointer rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+                {isDeleting ? "Usuwanie..." : "Usuń projekt"}
+            </button>
 
         </div>
 )}

@@ -56,10 +56,9 @@ const update = async (id: string, data: UpdateProjectDto): Promise<Project | und
   return updatedProject;
 };
 
-const deleteById = async (id: string): Promise<Project[]> => {
+const deleteById = async (id: string): Promise<void> => {
   await deleteDoc(doc(db, PROJECTS_COLLECTION, id));
 
-  return getAll();
 };
 
 export const projectService = { getAll, getById, create, update, deleteById };
