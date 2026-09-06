@@ -71,10 +71,9 @@ const updateStory = async (id: string, data: UpdateStoryDto): Promise<Story | un
   return updatedStory;
 };
 
-const deleteById = async (id: string): Promise<Story[]> => {
+const deleteById = async (id: string): Promise<void> => {
   await deleteDoc(doc(db, STORIES_COLLECTION, id));
 
-  return getAllStories();
 };
 
 export const storyService = {

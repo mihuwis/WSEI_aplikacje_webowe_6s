@@ -1,10 +1,11 @@
-import { Link, useParams } from "react-router-dom";
+import { generatePath, Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Status, Story } from "../../stories/types/story.types";
 import type { Task } from "../../tasks/types/task.types"
 import { projectService } from "../../projects/services/project.service";
 import { storyService } from "../../stories/services/stories.service";
 import { tasksService } from "../../tasks/services/tasks.services";
+import { ROUTES } from "../../../app/routes/routes.constants";
 
 const STORY_COLUMNS: Array<{
     status: Status;
@@ -58,11 +59,21 @@ export function StoryBoardPage() {
                                         <li 
                                             key={story.id}
                                             className="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
-                                            <button
-                                                className="block w-full text-left text-sm font-semibold text-slate-950 hover:text-blue-600"
-                                                onClick={()=> setSelectedStory(story)}>
-                                                {story.name}
-                                            </button>
+                                                <div>
+                                                    <button
+                                                        className="block w-full text-left text-sm font-semibold text-slate-950 hover:text-blue-600"
+                                                        onClick={()=> setSelectedStory(story)}>
+                                                        {story.name}
+                                                    </button>
+                                                    <Link to={generatePath(ROUTES.storyDetails, {
+                                                        projectId: story.projectId,
+                                                        storyId: story.id
+                                                    })}
+                                                    className="mt-2 inline-block text-sm font-medium text-blue-600 hover:underline">
+                                                    Detale
+                                                    </Link>
+                                                </div>
+
                                         </li>
                                     ))}
                                 </ul>

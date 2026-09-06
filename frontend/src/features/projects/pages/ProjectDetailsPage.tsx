@@ -69,10 +69,10 @@ export function ProjectDetailsPage(){
     }
 
     const handleDelete = async() => {
-        const confirmed = window.confirm("Wywalamy?");
+        const confirmed = window.confirm("Wywalamy projekt?");
 
         if (!confirmed) {
-        return;
+            return;
         }
 
         try {
