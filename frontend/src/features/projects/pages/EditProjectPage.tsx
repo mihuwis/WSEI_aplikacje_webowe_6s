@@ -28,6 +28,10 @@ export function EditProjectPage() {
 
         let ignoreResult = false;
 
+        setIsLoading(true);
+        setLoadErrorMessage(null);
+        setSubmitErrorMessage(null);
+
         const loadProject = async () => {
             try {
                 const loadedProject =

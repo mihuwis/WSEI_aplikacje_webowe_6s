@@ -132,5 +132,9 @@ export function ProjectDetailsPage(){
                 {isDeleting ? "Usuwanie..." : "Usuń projekt"}
             </button>
 
+            {deleteErrorMessage && (<p role="alert" className="text-sm text-red-600" >{deleteErrorMessage}</p>)}
+
+
+
         </div>
 )}
