@@ -1,21 +1,33 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ProjectsPage } from '../../features/projects/pages/ProjectsPage';
-import { ProjectDetailsPage } from '../../features/projects/pages/ProjectDetailsPage';
-import { StoryDetailsPage } from '../../features/stories/pages/StoryDetailsPage';
-import { ROUTES } from './routes.constants';
-import { AddTaskPage } from '../../features/tasks/pages/AddTaskPage';
-import { AppLayout } from '../layout/AppLayout';
-import { TaskDetailsPage } from '../../features/tasks/pages/TaskDetailsPage';
-import { StoryBoardPage } from '../../features/stories/pages/StoryBoardPage';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
 import { HomePage } from "../pages/HomePage";
+import { ROUTES } from './routes.constants';
 import { RequireAuth } from "../../features/auth/guards/RequireAuth";
 import { RequireActiveUser } from "../../features/auth/guards/RequireActiveUser";
 import { AccountStatusPage } from "../../features/auth/pages/AccountStatusPage";
 import { RequireAdmin } from "../../features/auth/guards/RequireAdmin";
 import { AdminUsersPage } from "../../features/users/pages/AdminUsersPage";
+import { AppLayout } from '../layout/AppLayout';
+
+// PROJECT
+import { ProjectsPage } from '../../features/projects/pages/ProjectsPage';
+import { ProjectDetailsPage } from '../../features/projects/pages/ProjectDetailsPage';
 import { AddProjectPage } from '../../features/projects/pages/AddProjectPage';
 import { EditProjectPage } from '../../features/projects/pages/EditProjectPage';
+// STORY
+import { StoryBoardPage } from '../../features/stories/pages/StoryBoardPage';
+import { StoryDetailsPage } from '../../features/stories/pages/StoryDetailsPage';
+import { AddStoryPage } from '../../features/stories/pages/AddStoryPage';
+import { EditStoryPage } from '../../features/stories/pages/EditStoryPage';
+//TASK
+
+import { AddTaskPage } from '../../features/tasks/pages/AddTaskPage';
+
+import { TaskDetailsPage } from '../../features/tasks/pages/TaskDetailsPage';
+
+
+
+
 
 export function AppRouter() {
     return (
@@ -39,46 +51,56 @@ export function AppRouter() {
 
               <Route element={<RequireActiveUser />}>
                   <Route element={<AppLayout />}>
-                      <Route
+                    <Route
                           path={ROUTES.projects}
                           element={<ProjectsPage />}
                       />
 
-                      <Route
+                    <Route
                           path={ROUTES.addProject}
                           element={<AddProjectPage />}
                       />
 
-                      <Route
+                    <Route
                           path={ROUTES.editProject}
                           element={<EditProjectPage />}
                       />
 
-                      <Route
-                          path={ROUTES.storyBoard}
-                          element={<StoryBoardPage />}
-                      />
-
-                      <Route
+                    <Route
                           path={ROUTES.projectDetails}
                           element={<ProjectDetailsPage />}
                       />
 
-                      <Route
+                    <Route
+                          path={ROUTES.storyBoard}
+                          element={<StoryBoardPage />}
+                      />
+
+                    <Route
                           path={ROUTES.storyDetails}
                           element={<StoryDetailsPage />}
                       />
 
-                      <Route
+                    <Route
+                          path={ROUTES.addStory}
+                          element={<AddStoryPage />}
+                      />
+
+                    <Route
+                          path={ROUTES.editStory}
+                          element={<EditStoryPage />}
+                      />
+
+                    <Route
                           path={ROUTES.taskDetails}
                           element={<TaskDetailsPage />}
                       />
 
-                      <Route
+                    <Route
                           path={ROUTES.addTask}
                           element={<AddTaskPage />}
                       />
-                      <Route element={<RequireAdmin />}>
+                    <Route element={<RequireAdmin />}>
                             <Route
                                 path={ROUTES.adminUsers}
                                 element={<AdminUsersPage />}
